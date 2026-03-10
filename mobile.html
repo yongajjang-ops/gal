@@ -533,7 +533,7 @@
         let gameState = 'start';
         let score = 0;
         let highScore = localStorage.getItem('galagaMobileHighScore') || 0;
-        let lives = 3;
+        let lives = 10;
         let stage = 1;
 
         // 속도 조절
@@ -720,7 +720,7 @@
             initAudio();
             gameState = 'playing';
             score = 0;
-            lives = 3;
+            lives = 10;
             stage = 1;
 
             const scale = getScaleFactor();
@@ -890,13 +890,18 @@
 
         function drawBullet(bullet, isEnemy = false) {
             const scale = getScaleFactor();
-            ctx.fillStyle = isEnemy ? '#ff6600' : '#00ffff';
-            ctx.fillRect(bullet.x - 2 * scale, bullet.y - 6 * scale, 4 * scale, 12 * scale);
+            const bulletWidth = Math.max(6, 4 * scale);
+            const bulletHeight = Math.max(16, 12 * scale);
 
-            ctx.shadowBlur = 10;
+            ctx.save();
+            ctx.fillStyle = isEnemy ? '#ff6600' : '#00ffff';
+            ctx.fillRect(bullet.x - bulletWidth / 2, bullet.y - bulletHeight / 2, bulletWidth, bulletHeight);
+
+            // 발광 효과
+            ctx.shadowBlur = 15;
             ctx.shadowColor = isEnemy ? '#ff6600' : '#00ffff';
-            ctx.fillRect(bullet.x - 2 * scale, bullet.y - 6 * scale, 4 * scale, 12 * scale);
-            ctx.shadowBlur = 0;
+            ctx.fillRect(bullet.x - bulletWidth / 2, bullet.y - bulletHeight / 2, bulletWidth, bulletHeight);
+            ctx.restore();
         }
 
         function createExplosion(x, y, color = '#ff6600') {

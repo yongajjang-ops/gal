@@ -579,7 +579,7 @@
         let gameState = 'start'; // start, playing, gameover
         let score = 0;
         let highScore = localStorage.getItem('galagaHighScore') || 0;
-        let lives = 3;
+        let lives = 10;
         let stage = 1;
         let gameLoop;
 
@@ -795,7 +795,7 @@
             initAudio();
             gameState = 'playing';
             score = 0;
-            lives = 3;
+            lives = 10;
             stage = 1;
             player.x = canvas.width / 2 - 20;
             player.y = canvas.height - 80;
