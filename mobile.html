@@ -661,38 +661,67 @@
             isDragging = false;
         });
 
-        // FIRE 버튼 설정
+        // FIRE 버튼 설정 (발사 + 드래그 이동)
         function setupFireButton(btn) {
             btn.addEventListener('touchstart', (e) => {
                 e.preventDefault();
-                e.stopPropagation();
                 keys.fire = true;
                 btn.classList.add('active');
+                // 드래그 시작
+                if (gameState === 'playing') {
+                    const touch = e.touches[0];
+                    touchStartX = touch.clientX;
+                    playerStartX = player.x;
+                    isDragging = true;
+                }
+            }, { passive: false });
+            btn.addEventListener('touchmove', (e) => {
+                e.preventDefault();
+                // 드래그 이동
+                if (isDragging && gameState === 'playing') {
+                    const touch = e.touches[0];
+                    const deltaX = touch.clientX - touchStartX;
+                    player.x = Math.max(10, Math.min(canvas.width - player.width - 10, playerStartX + deltaX));
+                }
             }, { passive: false });
             btn.addEventListener('touchend', (e) => {
                 e.preventDefault();
-                e.stopPropagation();
                 keys.fire = false;
                 btn.classList.remove('active');
+                isDragging = false;
             }, { passive: false });
             btn.addEventListener('touchcancel', (e) => {
                 e.preventDefault();
                 keys.fire = false;
                 btn.classList.remove('active');
+                isDragging = false;
             }, { passive: false });
             btn.addEventListener('mousedown', (e) => {
                 e.preventDefault();
                 keys.fire = true;
                 btn.classList.add('active');
+                if (gameState === 'playing') {
+                    touchStartX = e.clientX;
+                    playerStartX = player.x;
+                    isDragging = true;
+                }
+            });
+            btn.addEventListener('mousemove', (e) => {
+                if (isDragging && gameState === 'playing') {
+                    const deltaX = e.clientX - touchStartX;
+                    player.x = Math.max(10, Math.min(canvas.width - player.width - 10, playerStartX + deltaX));
+                }
             });
             btn.addEventListener('mouseup', (e) => {
                 e.preventDefault();
                 keys.fire = false;
                 btn.classList.remove('active');
+                isDragging = false;
             });
             btn.addEventListener('mouseleave', () => {
                 keys.fire = false;
                 btn.classList.remove('active');
+                isDragging = false;
             });
         }
 
