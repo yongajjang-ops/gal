@@ -890,17 +890,27 @@
 
         function drawBullet(bullet, isEnemy = false) {
             const scale = getScaleFactor();
-            const bulletWidth = Math.max(6, 4 * scale);
-            const bulletHeight = Math.max(16, 12 * scale);
+            const bulletWidth = Math.max(8, 6 * scale);
+            const bulletHeight = Math.max(24, 18 * scale);
 
             ctx.save();
+
+            // 외곽 발광 효과 (먼저 그림)
+            ctx.shadowBlur = 20;
+            ctx.shadowColor = isEnemy ? '#ff6600' : '#00ffff';
+
+            // 외곽 테두리
+            ctx.fillStyle = isEnemy ? '#ffaa00' : '#ffffff';
+            ctx.fillRect(bullet.x - bulletWidth / 2 - 1, bullet.y - bulletHeight / 2 - 1, bulletWidth + 2, bulletHeight + 2);
+
+            // 메인 총알 색상
             ctx.fillStyle = isEnemy ? '#ff6600' : '#00ffff';
             ctx.fillRect(bullet.x - bulletWidth / 2, bullet.y - bulletHeight / 2, bulletWidth, bulletHeight);
 
-            // 발광 효과
-            ctx.shadowBlur = 15;
-            ctx.shadowColor = isEnemy ? '#ff6600' : '#00ffff';
-            ctx.fillRect(bullet.x - bulletWidth / 2, bullet.y - bulletHeight / 2, bulletWidth, bulletHeight);
+            // 중심 밝은 부분
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(bullet.x - bulletWidth / 4, bullet.y - bulletHeight / 2 + 2, bulletWidth / 2, bulletHeight - 4);
+
             ctx.restore();
         }
 
