@@ -616,18 +616,36 @@
         const restartBtn = document.getElementById('restartBtn');
 
         function setupButton(btn, key) {
+            // 터치 이벤트 (passive: false로 preventDefault 허용)
             btn.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                keys[key] = true;
+                btn.classList.add('active');
+            }, { passive: false });
+            btn.addEventListener('touchend', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                keys[key] = false;
+                btn.classList.remove('active');
+            }, { passive: false });
+            btn.addEventListener('touchcancel', (e) => {
+                e.preventDefault();
+                keys[key] = false;
+                btn.classList.remove('active');
+            }, { passive: false });
+            // 마우스 이벤트 (일부 브라우저 호환성)
+            btn.addEventListener('mousedown', (e) => {
                 e.preventDefault();
                 keys[key] = true;
                 btn.classList.add('active');
             });
-            btn.addEventListener('touchend', (e) => {
+            btn.addEventListener('mouseup', (e) => {
                 e.preventDefault();
                 keys[key] = false;
                 btn.classList.remove('active');
             });
-            btn.addEventListener('touchcancel', (e) => {
-                e.preventDefault();
+            btn.addEventListener('mouseleave', () => {
                 keys[key] = false;
                 btn.classList.remove('active');
             });
@@ -1157,9 +1175,10 @@
         function updateBullets() {
             const scale = getScaleFactor();
 
+            const bulletSpeed = Math.max(10, 10 * scale) * gameSpeed;
             for (let i = player.bullets.length - 1; i >= 0; i--) {
                 const bullet = player.bullets[i];
-                bullet.y -= 10 * scale * gameSpeed;
+                bullet.y -= bulletSpeed;
 
                 if (bullet.y < 0) {
                     player.bullets.splice(i, 1);
