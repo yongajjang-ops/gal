@@ -930,22 +930,9 @@
         }
 
         function drawBullet(bullet, isEnemy = false) {
-            const bulletWidth = 10;
-            const bulletHeight = 30;
-            const x = bullet.x - bulletWidth / 2;
-            const y = bullet.y - bulletHeight / 2;
-
-            // 외곽 (밝은 색)
-            ctx.fillStyle = '#ffffff';
-            ctx.fillRect(x - 2, y - 2, bulletWidth + 4, bulletHeight + 4);
-
-            // 메인 색상
+            // PC 버전과 동일한 방식 (크기만 더 크게)
             ctx.fillStyle = isEnemy ? '#ff6600' : '#00ffff';
-            ctx.fillRect(x, y, bulletWidth, bulletHeight);
-
-            // 중심 하이라이트
-            ctx.fillStyle = '#ffffff';
-            ctx.fillRect(x + 3, y + 4, bulletWidth - 6, bulletHeight - 8);
+            ctx.fillRect(bullet.x - 4, bullet.y - 12, 8, 24);
         }
 
         function createExplosion(x, y, color = '#ff6600') {
