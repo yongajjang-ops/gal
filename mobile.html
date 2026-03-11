@@ -142,7 +142,7 @@
 
         .mobile-controls {
             display: flex;
-            justify-content: space-between;
+            justify-content: center;
             align-items: center;
             padding: 15px 20px;
             background: rgba(0, 0, 0, 0.9);
@@ -239,7 +239,7 @@
             <button class="start-btn" id="startBtn">START</button>
 
             <div class="controls-info">
-                <p>◀ ▶ 버튼으로 이동</p>
+                <p>화면을 좌우로 드래그하여 이동</p>
                 <p>FIRE 버튼으로 발사</p>
             </div>
         </div>
@@ -256,10 +256,6 @@
         </div>
 
         <div class="mobile-controls" id="mobileControls" style="display: none;">
-            <div class="move-buttons">
-                <button class="control-btn" id="leftBtn">◀</button>
-                <button class="control-btn" id="rightBtn">▶</button>
-            </div>
             <button class="control-btn fire-btn" id="fireBtn">FIRE</button>
         </div>
     </div>
@@ -609,51 +605,98 @@
         let fireDelay = 150;
 
         // 모바일 컨트롤
-        const leftBtn = document.getElementById('leftBtn');
-        const rightBtn = document.getElementById('rightBtn');
         const fireBtn = document.getElementById('fireBtn');
         const startBtn = document.getElementById('startBtn');
         const restartBtn = document.getElementById('restartBtn');
 
-        function setupButton(btn, key) {
-            // 터치 이벤트 (passive: false로 preventDefault 허용)
+        // 터치 드래그로 우주선 이동
+        let touchStartX = 0;
+        let playerStartX = 0;
+        let isDragging = false;
+
+        canvas.addEventListener('touchstart', (e) => {
+            if (gameState !== 'playing') return;
+            e.preventDefault();
+            const touch = e.touches[0];
+            touchStartX = touch.clientX;
+            playerStartX = player.x;
+            isDragging = true;
+        }, { passive: false });
+
+        canvas.addEventListener('touchmove', (e) => {
+            if (!isDragging || gameState !== 'playing') return;
+            e.preventDefault();
+            const touch = e.touches[0];
+            const deltaX = touch.clientX - touchStartX;
+            player.x = Math.max(10, Math.min(canvas.width - player.width - 10, playerStartX + deltaX));
+        }, { passive: false });
+
+        canvas.addEventListener('touchend', () => {
+            isDragging = false;
+        });
+
+        canvas.addEventListener('touchcancel', () => {
+            isDragging = false;
+        });
+
+        // 마우스 드래그 (데스크탑 테스트용)
+        canvas.addEventListener('mousedown', (e) => {
+            if (gameState !== 'playing') return;
+            touchStartX = e.clientX;
+            playerStartX = player.x;
+            isDragging = true;
+        });
+
+        canvas.addEventListener('mousemove', (e) => {
+            if (!isDragging || gameState !== 'playing') return;
+            const deltaX = e.clientX - touchStartX;
+            player.x = Math.max(10, Math.min(canvas.width - player.width - 10, playerStartX + deltaX));
+        });
+
+        canvas.addEventListener('mouseup', () => {
+            isDragging = false;
+        });
+
+        canvas.addEventListener('mouseleave', () => {
+            isDragging = false;
+        });
+
+        // FIRE 버튼 설정
+        function setupFireButton(btn) {
             btn.addEventListener('touchstart', (e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                keys[key] = true;
+                keys.fire = true;
                 btn.classList.add('active');
             }, { passive: false });
             btn.addEventListener('touchend', (e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                keys[key] = false;
+                keys.fire = false;
                 btn.classList.remove('active');
             }, { passive: false });
             btn.addEventListener('touchcancel', (e) => {
                 e.preventDefault();
-                keys[key] = false;
+                keys.fire = false;
                 btn.classList.remove('active');
             }, { passive: false });
-            // 마우스 이벤트 (일부 브라우저 호환성)
             btn.addEventListener('mousedown', (e) => {
                 e.preventDefault();
-                keys[key] = true;
+                keys.fire = true;
                 btn.classList.add('active');
             });
             btn.addEventListener('mouseup', (e) => {
                 e.preventDefault();
-                keys[key] = false;
+                keys.fire = false;
                 btn.classList.remove('active');
             });
             btn.addEventListener('mouseleave', () => {
-                keys[key] = false;
+                keys.fire = false;
                 btn.classList.remove('active');
             });
         }
 
-        setupButton(leftBtn, 'left');
-        setupButton(rightBtn, 'right');
-        setupButton(fireBtn, 'fire');
+        setupFireButton(fireBtn);
 
         startBtn.addEventListener('click', (e) => {
             e.preventDefault();
