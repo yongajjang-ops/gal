@@ -216,11 +216,49 @@
         .start-btn:active {
             background: rgba(255, 255, 0, 0.5);
         }
+
+        .top-buttons {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            display: flex;
+            gap: 10px;
+            z-index: 50;
+        }
+
+        .icon-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            border: 2px solid #888;
+            background: rgba(0, 0, 0, 0.7);
+            color: #fff;
+            font-size: 18px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            touch-action: manipulation;
+        }
+
+        .icon-btn:active {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .icon-btn.muted {
+            color: #ff4444;
+            border-color: #ff4444;
+        }
     </style>
 </head>
 <body>
     <div class="game-container">
         <canvas id="gameCanvas"></canvas>
+
+        <div class="top-buttons">
+            <button class="icon-btn" id="fullscreenBtn" title="전체화면">⛶</button>
+            <button class="icon-btn" id="muteBtn" title="음소거">🔊</button>
+        </div>
 
         <div id="startScreen">
             <h1>GALAGA</h1>
@@ -293,7 +331,7 @@
         }
 
         function playTone(frequency, duration, type = 'square', volume = 0.3, delay = 0) {
-            if (!audioCtx) return;
+            if (!audioCtx || isMuted) return;
 
             const oscillator = audioCtx.createOscillator();
             const gainNode = audioCtx.createGain();
@@ -428,7 +466,7 @@
         }
 
         function startBGM() {
-            if (!audioCtx || bgmPlaying) return;
+            if (!audioCtx || bgmPlaying || isMuted) return;
             bgmPlaying = true;
 
             const melody = [
@@ -531,6 +569,7 @@
         let highScore = localStorage.getItem('galagaMobileHighScore') || 0;
         let lives = 10;
         let stage = 1;
+        let isMuted = false;
 
         // 속도 조절
         let gameSpeed = 1;
@@ -608,6 +647,37 @@
         const fireBtn = document.getElementById('fireBtn');
         const startBtn = document.getElementById('startBtn');
         const restartBtn = document.getElementById('restartBtn');
+        const fullscreenBtn = document.getElementById('fullscreenBtn');
+        const muteBtn = document.getElementById('muteBtn');
+
+        // 전체화면 기능
+        fullscreenBtn.addEventListener('click', () => {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(err => {
+                    console.log('전체화면 전환 실패:', err);
+                });
+                fullscreenBtn.textContent = '⛶';
+            } else {
+                document.exitFullscreen();
+                fullscreenBtn.textContent = '⛶';
+            }
+        });
+
+        // 음소거 기능
+        muteBtn.addEventListener('click', () => {
+            isMuted = !isMuted;
+            if (isMuted) {
+                muteBtn.textContent = '🔇';
+                muteBtn.classList.add('muted');
+                stopBGM();
+            } else {
+                muteBtn.textContent = '🔊';
+                muteBtn.classList.remove('muted');
+                if (gameState === 'playing') {
+                    startBGM();
+                }
+            }
+        });
 
         // 터치 드래그로 우주선 이동 (좌우 + 상하)
         let touchStartX = 0;
