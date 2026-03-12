@@ -249,6 +249,48 @@
             color: #ff4444;
             border-color: #ff4444;
         }
+
+        .icon-btn.paused {
+            color: #ffff00;
+            border-color: #ffff00;
+            background: rgba(255, 255, 0, 0.3);
+        }
+
+        #stopBtn {
+            color: #ff6666;
+            border-color: #ff6666;
+        }
+
+        #stopBtn:active {
+            background: rgba(255, 100, 100, 0.5);
+        }
+
+        #pauseScreen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 90;
+        }
+
+        #pauseScreen h2 {
+            color: #ffff00;
+            font-size: 28px;
+            text-shadow: 0 0 20px #ffff00;
+            animation: blink 1s step-start infinite;
+        }
+
+        #pauseScreen p {
+            color: #fff;
+            font-size: 12px;
+            margin-top: 20px;
+        }
     </style>
 </head>
 <body>
@@ -258,6 +300,8 @@
         <div class="top-buttons">
             <button class="icon-btn" id="fullscreenBtn" title="전체화면">⛶</button>
             <button class="icon-btn" id="muteBtn" title="음소거">🔊</button>
+            <button class="icon-btn game-btn" id="pauseBtn" title="일시정지" style="display: none;">⏸</button>
+            <button class="icon-btn game-btn" id="stopBtn" title="게임종료" style="display: none;">⏹</button>
         </div>
 
         <div id="startScreen">
@@ -287,6 +331,11 @@
             <p>SCORE: <span id="finalScore">0</span></p>
             <p>STAGE: <span id="finalStage">1</span></p>
             <button class="start-btn" id="restartBtn">RESTART</button>
+        </div>
+
+        <div id="pauseScreen" style="display: none;">
+            <h2>PAUSED</h2>
+            <p>일시정지 버튼을 눌러 계속하기</p>
         </div>
 
         <div class="speed-indicator" id="speedIndicator" style="display: none;">
@@ -603,7 +652,6 @@
             bullets: [],
             maxBullets: 10,
             isAlive: true,
-            respawnTimer: 0,
             captured: false
         };
 
@@ -649,6 +697,9 @@
         const restartBtn = document.getElementById('restartBtn');
         const fullscreenBtn = document.getElementById('fullscreenBtn');
         const muteBtn = document.getElementById('muteBtn');
+        const pauseBtn = document.getElementById('pauseBtn');
+        const stopBtn = document.getElementById('stopBtn');
+        const pauseScreen = document.getElementById('pauseScreen');
 
         // 전체화면 기능
         fullscreenBtn.addEventListener('click', () => {
@@ -678,6 +729,58 @@
                 }
             }
         });
+
+        // 일시정지 기능
+        pauseBtn.addEventListener('click', () => {
+            if (gameState === 'playing') {
+                pauseGame();
+            } else if (gameState === 'paused') {
+                resumeGame();
+            }
+        });
+
+        // 게임 중지 기능
+        stopBtn.addEventListener('click', () => {
+            if (gameState === 'playing' || gameState === 'paused') {
+                stopGame();
+            }
+        });
+
+        function pauseGame() {
+            gameState = 'paused';
+            stopBGM();
+            pauseBtn.textContent = '▶';
+            pauseBtn.classList.add('paused');
+            pauseScreen.style.display = 'flex';
+        }
+
+        function resumeGame() {
+            gameState = 'playing';
+            if (!isMuted) {
+                startBGM();
+            }
+            pauseBtn.textContent = '⏸';
+            pauseBtn.classList.remove('paused');
+            pauseScreen.style.display = 'none';
+        }
+
+        function stopGame() {
+            gameState = 'start';
+            stopBGM();
+
+            // UI 초기화
+            pauseScreen.style.display = 'none';
+            document.getElementById('mobileControls').style.display = 'none';
+            document.getElementById('speedIndicator').style.display = 'none';
+            pauseBtn.style.display = 'none';
+            stopBtn.style.display = 'none';
+            pauseBtn.textContent = '⏸';
+            pauseBtn.classList.remove('paused');
+
+            // 시작 화면 표시
+            document.getElementById('startScreen').style.display = 'flex';
+            resizeCanvas();
+        }
 
         // 터치 드래그로 우주선 이동 (좌우 + 상하)
         let touchStartX = 0;
@@ -749,6 +852,13 @@
         function setupFireButton(btn) {
             btn.addEventListener('touchstart', (e) => {
                 e.preventDefault();
+
+                // RESTART 상태일 때 리스폰
+                if (!player.isAlive && lives > 0 && gameState === 'playing') {
+                    respawnPlayer();
+                    return;
+                }
+
                 keys.fire = true;
                 btn.classList.add('active');
                 // 드래그 시작
@@ -786,6 +896,13 @@
             }, { passive: false });
             btn.addEventListener('mousedown', (e) => {
                 e.preventDefault();
+
+                // RESTART 상태일 때 리스폰
+                if (!player.isAlive && lives > 0 && gameState === 'playing') {
+                    respawnPlayer();
+                    return;
+                }
+
                 keys.fire = true;
                 btn.classList.add('active');
                 if (gameState === 'playing') {
@@ -905,6 +1022,20 @@
             lives = 10;
             stage = 1;
 
+            // 먼저 UI 표시 및 캔버스 크기 조정
+            document.getElementById('startScreen').style.display = 'none';
+            document.getElementById('gameOverScreen').style.display = 'none';
+            document.getElementById('mobileControls').style.display = 'flex';
+            document.getElementById('speedIndicator').style.display = 'block';
+            pauseScreen.style.display = 'none';
+            pauseBtn.style.display = 'flex';
+            stopBtn.style.display = 'flex';
+            pauseBtn.textContent = '⏸';
+            pauseBtn.classList.remove('paused');
+
+            resizeCanvas();
+
+            // 캔버스 크기 조정 후 플레이어 위치 설정
             const scale = getScaleFactor();
             player.width = Math.max(40, 40 * scale);
             player.height = Math.max(40, 40 * scale);
@@ -917,14 +1048,11 @@
             player.maxBullets = 10;
             particles = [];
 
-            document.getElementById('startScreen').style.display = 'none';
-            document.getElementById('gameOverScreen').style.display = 'none';
-            document.getElementById('mobileControls').style.display = 'flex';
-            document.getElementById('speedIndicator').style.display = 'block';
-
-            resizeCanvas();
             initStars();
             updateSpeedIndicator();
+
+            // FIRE 버튼 텍스트 초기화
+            fireBtn.textContent = 'FIRE';
 
             playStartSound();
             setTimeout(() => startBGM(), 500);
@@ -943,6 +1071,8 @@
             document.getElementById('finalStage').textContent = stage;
             document.getElementById('gameOverScreen').style.display = 'flex';
             document.getElementById('speedIndicator').style.display = 'none';
+            pauseBtn.style.display = 'none';
+            stopBtn.style.display = 'none';
         }
 
         function nextStage() {
@@ -1266,12 +1396,7 @@
 
         function updatePlayer() {
             if (!player.isAlive) {
-                player.respawnTimer--;
-                if (player.respawnTimer <= 0 && lives > 0) {
-                    player.isAlive = true;
-                    player.x = canvas.width / 2 - player.width / 2;
-                    player.y = canvas.height - 200;
-                }
+                // 리스폰은 RESTART 버튼을 눌러야만 됨
                 return;
             }
 
@@ -1361,12 +1486,24 @@
         function playerHit() {
             lives--;
             player.isAlive = false;
-            player.respawnTimer = 120;
             createExplosion(player.x + player.width / 2, player.y + player.height / 2, '#00ffff');
             playPlayerHitSound();
 
             if (lives <= 0) {
                 gameOver();
+            } else {
+                // FIRE 버튼을 RESTART로 변경
+                fireBtn.textContent = 'RESTART';
+            }
+        }
+
+        function respawnPlayer() {
+            if (!player.isAlive && lives > 0) {
+                player.isAlive = true;
+                player.x = canvas.width / 2 - player.width / 2;
+                player.y = canvas.height - 200;
+                // RESTART 버튼을 FIRE로 변경
+                fireBtn.textContent = 'FIRE';
             }
         }
 
@@ -1460,6 +1597,23 @@
                 }
 
                 updateParticles();
+                drawUI();
+            } else if (gameState === 'paused') {
+                // 일시정지 상태: 화면만 그리고 로직은 실행 안 함
+                drawPlayer();
+
+                for (let enemy of enemies) {
+                    drawEnemy(enemy);
+                }
+
+                for (let bullet of player.bullets) {
+                    drawBullet(bullet);
+                }
+
+                for (let bullet of enemyBullets) {
+                    drawBullet(bullet, true);
+                }
+
                 drawUI();
             }
 
