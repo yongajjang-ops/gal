@@ -223,7 +223,7 @@
             left: 10px;
             display: flex;
             gap: 10px;
-            z-index: 50;
+            z-index: 95;
         }
 
         .icon-btn {
@@ -781,6 +781,13 @@
             document.getElementById('startScreen').style.display = 'flex';
             resizeCanvas();
         }
+
+        // pauseScreen 클릭 시 게임 재개
+        pauseScreen.addEventListener('click', () => {
+            if (gameState === 'paused') {
+                resumeGame();
+            }
+        });
 
         // 터치 드래그로 우주선 이동 (좌우 + 상하)
         let touchStartX = 0;
