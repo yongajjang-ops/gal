@@ -142,7 +142,7 @@
 
         .mobile-controls {
             display: flex;
-            justify-content: space-between;
+            justify-content: center;
             align-items: center;
             padding: 15px 20px;
             background: rgba(0, 0, 0, 0.9);
@@ -216,11 +216,49 @@
         .start-btn:active {
             background: rgba(255, 255, 0, 0.5);
         }
+
+        .top-buttons {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            display: flex;
+            gap: 10px;
+            z-index: 50;
+        }
+
+        .icon-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            border: 2px solid #888;
+            background: rgba(0, 0, 0, 0.7);
+            color: #fff;
+            font-size: 18px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            touch-action: manipulation;
+        }
+
+        .icon-btn:active {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .icon-btn.muted {
+            color: #ff4444;
+            border-color: #ff4444;
+        }
     </style>
 </head>
 <body>
     <div class="game-container">
         <canvas id="gameCanvas"></canvas>
+
+        <div class="top-buttons">
+            <button class="icon-btn" id="fullscreenBtn" title="전체화면">⛶</button>
+            <button class="icon-btn" id="muteBtn" title="음소거">🔊</button>
+        </div>
 
         <div id="startScreen">
             <h1>GALAGA</h1>
@@ -239,7 +277,7 @@
             <button class="start-btn" id="startBtn">START</button>
 
             <div class="controls-info">
-                <p>◀ ▶ 버튼으로 이동</p>
+                <p>화면을 좌우로 드래그하여 이동</p>
                 <p>FIRE 버튼으로 발사</p>
             </div>
         </div>
@@ -256,10 +294,6 @@
         </div>
 
         <div class="mobile-controls" id="mobileControls" style="display: none;">
-            <div class="move-buttons">
-                <button class="control-btn" id="leftBtn">◀</button>
-                <button class="control-btn" id="rightBtn">▶</button>
-            </div>
             <button class="control-btn fire-btn" id="fireBtn">FIRE</button>
         </div>
     </div>
@@ -297,7 +331,7 @@
         }
 
         function playTone(frequency, duration, type = 'square', volume = 0.3, delay = 0) {
-            if (!audioCtx) return;
+            if (!audioCtx || isMuted) return;
 
             const oscillator = audioCtx.createOscillator();
             const gainNode = audioCtx.createGain();
@@ -432,7 +466,7 @@
         }
 
         function startBGM() {
-            if (!audioCtx || bgmPlaying) return;
+            if (!audioCtx || bgmPlaying || isMuted) return;
             bgmPlaying = true;
 
             const melody = [
@@ -535,6 +569,7 @@
         let highScore = localStorage.getItem('galagaMobileHighScore') || 0;
         let lives = 10;
         let stage = 1;
+        let isMuted = false;
 
         // 속도 조절
         let gameSpeed = 1;
@@ -568,7 +603,6 @@
             bullets: [],
             maxBullets: 10,
             isAlive: true,
-            respawnTimer: 0,
             captured: false
         };
 
@@ -609,51 +643,194 @@
         let fireDelay = 150;
 
         // 모바일 컨트롤
-        const leftBtn = document.getElementById('leftBtn');
-        const rightBtn = document.getElementById('rightBtn');
         const fireBtn = document.getElementById('fireBtn');
         const startBtn = document.getElementById('startBtn');
         const restartBtn = document.getElementById('restartBtn');
+        const fullscreenBtn = document.getElementById('fullscreenBtn');
+        const muteBtn = document.getElementById('muteBtn');
 
-        function setupButton(btn, key) {
-            // 터치 이벤트 (passive: false로 preventDefault 허용)
+        // 전체화면 기능
+        fullscreenBtn.addEventListener('click', () => {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(err => {
+                    console.log('전체화면 전환 실패:', err);
+                });
+                fullscreenBtn.textContent = '⛶';
+            } else {
+                document.exitFullscreen();
+                fullscreenBtn.textContent = '⛶';
+            }
+        });
+
+        // 음소거 기능
+        muteBtn.addEventListener('click', () => {
+            isMuted = !isMuted;
+            if (isMuted) {
+                muteBtn.textContent = '🔇';
+                muteBtn.classList.add('muted');
+                stopBGM();
+            } else {
+                muteBtn.textContent = '🔊';
+                muteBtn.classList.remove('muted');
+                if (gameState === 'playing') {
+                    startBGM();
+                }
+            }
+        });
+
+        // 터치 드래그로 우주선 이동 (좌우 + 상하)
+        let touchStartX = 0;
+        let touchStartY = 0;
+        let playerStartX = 0;
+        let playerStartY = 0;
+        let isDragging = false;
+
+        // Y좌표 제한 (화면 상단~하단 범위)
+        const minY = 100;
+        const maxY = () => canvas.height - 50;
+
+        canvas.addEventListener('touchstart', (e) => {
+            if (gameState !== 'playing') return;
+            e.preventDefault();
+            const touch = e.touches[0];
+            touchStartX = touch.clientX;
+            touchStartY = touch.clientY;
+            playerStartX = player.x;
+            playerStartY = player.y;
+            isDragging = true;
+        }, { passive: false });
+
+        canvas.addEventListener('touchmove', (e) => {
+            if (!isDragging || gameState !== 'playing') return;
+            e.preventDefault();
+            const touch = e.touches[0];
+            const deltaX = touch.clientX - touchStartX;
+            const deltaY = touch.clientY - touchStartY;
+            player.x = Math.max(10, Math.min(canvas.width - player.width - 10, playerStartX + deltaX));
+            player.y = Math.max(minY, Math.min(maxY(), playerStartY + deltaY));
+        }, { passive: false });
+
+        canvas.addEventListener('touchend', () => {
+            isDragging = false;
+        });
+
+        canvas.addEventListener('touchcancel', () => {
+            isDragging = false;
+        });
+
+        // 마우스 드래그 (데스크탑 테스트용)
+        canvas.addEventListener('mousedown', (e) => {
+            if (gameState !== 'playing') return;
+            touchStartX = e.clientX;
+            touchStartY = e.clientY;
+            playerStartX = player.x;
+            playerStartY = player.y;
+            isDragging = true;
+        });
+
+        canvas.addEventListener('mousemove', (e) => {
+            if (!isDragging || gameState !== 'playing') return;
+            const deltaX = e.clientX - touchStartX;
+            const deltaY = e.clientY - touchStartY;
+            player.x = Math.max(10, Math.min(canvas.width - player.width - 10, playerStartX + deltaX));
+            player.y = Math.max(minY, Math.min(maxY(), playerStartY + deltaY));
+        });
+
+        canvas.addEventListener('mouseup', () => {
+            isDragging = false;
+        });
+
+        canvas.addEventListener('mouseleave', () => {
+            isDragging = false;
+        });
+
+        // FIRE 버튼 설정 (발사 + 드래그 이동)
+        function setupFireButton(btn) {
             btn.addEventListener('touchstart', (e) => {
                 e.preventDefault();
-                e.stopPropagation();
-                keys[key] = true;
+
+                // RESTART 상태일 때 리스폰
+                if (!player.isAlive && lives > 0 && gameState === 'playing') {
+                    respawnPlayer();
+                    return;
+                }
+
+                keys.fire = true;
                 btn.classList.add('active');
+                // 드래그 시작
+                if (gameState === 'playing') {
+                    const touch = e.touches[0];
+                    touchStartX = touch.clientX;
+                    touchStartY = touch.clientY;
+                    playerStartX = player.x;
+                    playerStartY = player.y;
+                    isDragging = true;
+                }
+            }, { passive: false });
+            btn.addEventListener('touchmove', (e) => {
+                e.preventDefault();
+                // 드래그 이동
+                if (isDragging && gameState === 'playing') {
+                    const touch = e.touches[0];
+                    const deltaX = touch.clientX - touchStartX;
+                    const deltaY = touch.clientY - touchStartY;
+                    player.x = Math.max(10, Math.min(canvas.width - player.width - 10, playerStartX + deltaX));
+                    player.y = Math.max(minY, Math.min(maxY(), playerStartY + deltaY));
+                }
             }, { passive: false });
             btn.addEventListener('touchend', (e) => {
                 e.preventDefault();
-                e.stopPropagation();
-                keys[key] = false;
+                keys.fire = false;
                 btn.classList.remove('active');
+                isDragging = false;
             }, { passive: false });
             btn.addEventListener('touchcancel', (e) => {
                 e.preventDefault();
-                keys[key] = false;
+                keys.fire = false;
                 btn.classList.remove('active');
+                isDragging = false;
             }, { passive: false });
-            // 마우스 이벤트 (일부 브라우저 호환성)
             btn.addEventListener('mousedown', (e) => {
                 e.preventDefault();
-                keys[key] = true;
+
+                // RESTART 상태일 때 리스폰
+                if (!player.isAlive && lives > 0 && gameState === 'playing') {
+                    respawnPlayer();
+                    return;
+                }
+
+                keys.fire = true;
                 btn.classList.add('active');
+                if (gameState === 'playing') {
+                    touchStartX = e.clientX;
+                    touchStartY = e.clientY;
+                    playerStartX = player.x;
+                    playerStartY = player.y;
+                    isDragging = true;
+                }
+            });
+            btn.addEventListener('mousemove', (e) => {
+                if (isDragging && gameState === 'playing') {
+                    const deltaX = e.clientX - touchStartX;
+                    const deltaY = e.clientY - touchStartY;
+                    player.x = Math.max(10, Math.min(canvas.width - player.width - 10, playerStartX + deltaX));
+                    player.y = Math.max(minY, Math.min(maxY(), playerStartY + deltaY));
+                }
             });
             btn.addEventListener('mouseup', (e) => {
                 e.preventDefault();
-                keys[key] = false;
+                keys.fire = false;
                 btn.classList.remove('active');
+                isDragging = false;
             });
             btn.addEventListener('mouseleave', () => {
-                keys[key] = false;
+                keys.fire = false;
                 btn.classList.remove('active');
+                isDragging = false;
             });
         }
 
-        setupButton(leftBtn, 'left');
-        setupButton(rightBtn, 'right');
-        setupButton(fireBtn, 'fire');
+        setupFireButton(fireBtn);
 
         startBtn.addEventListener('click', (e) => {
             e.preventDefault();
@@ -741,26 +918,32 @@
             lives = 10;
             stage = 1;
 
-            const scale = getScaleFactor();
-            player.width = Math.max(40, 40 * scale);
-            player.height = Math.max(40, 40 * scale);
-            player.speed = Math.max(5, 5 * scale);
-            player.x = canvas.width / 2 - player.width / 2;
-            player.y = canvas.height - Math.max(80, 80 * scale);
-            player.isAlive = true;
-            player.bullets = [];
-            player.captured = false;
-            player.maxBullets = 10;
-            particles = [];
-
+            // 먼저 UI 표시 및 캔버스 크기 조정
             document.getElementById('startScreen').style.display = 'none';
             document.getElementById('gameOverScreen').style.display = 'none';
             document.getElementById('mobileControls').style.display = 'flex';
             document.getElementById('speedIndicator').style.display = 'block';
 
             resizeCanvas();
+
+            // 캔버스 크기 조정 후 플레이어 위치 설정
+            const scale = getScaleFactor();
+            player.width = Math.max(40, 40 * scale);
+            player.height = Math.max(40, 40 * scale);
+            player.speed = Math.max(5, 5 * scale);
+            player.x = canvas.width / 2 - player.width / 2;
+            player.y = canvas.height - 200;
+            player.isAlive = true;
+            player.bullets = [];
+            player.captured = false;
+            player.maxBullets = 10;
+            particles = [];
+
             initStars();
             updateSpeedIndicator();
+
+            // FIRE 버튼 텍스트 초기화
+            fireBtn.textContent = 'FIRE';
 
             playStartSound();
             setTimeout(() => startBGM(), 500);
@@ -800,24 +983,7 @@
             ctx.save();
             ctx.translate(player.x + player.width / 2, player.y + player.height / 2);
 
-            // 발광 효과 추가
-            ctx.shadowBlur = 25;
-            ctx.shadowColor = '#00ffff';
-
-            // 외곽선 (테두리)
-            ctx.strokeStyle = '#00ffff';
-            ctx.lineWidth = 3;
-            ctx.beginPath();
-            ctx.moveTo(0, -player.height / 2);
-            ctx.lineTo(-player.width / 2, player.height / 2);
-            ctx.lineTo(-player.width / 4, player.height / 3);
-            ctx.lineTo(0, player.height / 2.5);
-            ctx.lineTo(player.width / 4, player.height / 3);
-            ctx.lineTo(player.width / 2, player.height / 2);
-            ctx.closePath();
-            ctx.stroke();
-
-            // 메인 몸체
+            // 우주선 본체 (PC 버전과 동일)
             ctx.fillStyle = '#ffffff';
             ctx.beginPath();
             ctx.moveTo(0, -player.height / 2);
@@ -829,8 +995,7 @@
             ctx.closePath();
             ctx.fill();
 
-            // 조종석
-            ctx.shadowBlur = 0;
+            // 날개 디테일
             ctx.fillStyle = '#00ffff';
             ctx.beginPath();
             ctx.moveTo(0, -player.height / 3);
@@ -842,11 +1007,9 @@
 
             // 엔진 불꽃
             ctx.fillStyle = '#ff6600';
-            ctx.shadowBlur = 15;
-            ctx.shadowColor = '#ff6600';
             ctx.beginPath();
             ctx.moveTo(-player.width / 6, player.height / 2.5);
-            ctx.lineTo(0, player.height / 2 + Math.random() * 10 + 8);
+            ctx.lineTo(0, player.height / 2 + Math.random() * 8 + 5);
             ctx.lineTo(player.width / 6, player.height / 2.5);
             ctx.closePath();
             ctx.fill();
@@ -930,29 +1093,9 @@
         }
 
         function drawBullet(bullet, isEnemy = false) {
-            const scale = getScaleFactor();
-            const bulletWidth = Math.max(8, 6 * scale);
-            const bulletHeight = Math.max(24, 18 * scale);
-
-            ctx.save();
-
-            // 외곽 발광 효과 (먼저 그림)
-            ctx.shadowBlur = 20;
-            ctx.shadowColor = isEnemy ? '#ff6600' : '#00ffff';
-
-            // 외곽 테두리
-            ctx.fillStyle = isEnemy ? '#ffaa00' : '#ffffff';
-            ctx.fillRect(bullet.x - bulletWidth / 2 - 1, bullet.y - bulletHeight / 2 - 1, bulletWidth + 2, bulletHeight + 2);
-
-            // 메인 총알 색상
+            // PC 버전과 동일한 방식 (크기만 더 크게)
             ctx.fillStyle = isEnemy ? '#ff6600' : '#00ffff';
-            ctx.fillRect(bullet.x - bulletWidth / 2, bullet.y - bulletHeight / 2, bulletWidth, bulletHeight);
-
-            // 중심 밝은 부분
-            ctx.fillStyle = '#ffffff';
-            ctx.fillRect(bullet.x - bulletWidth / 4, bullet.y - bulletHeight / 2 + 2, bulletWidth / 2, bulletHeight - 4);
-
-            ctx.restore();
+            ctx.fillRect(bullet.x - 4, bullet.y - 12, 8, 24);
         }
 
         function createExplosion(x, y, color = '#ff6600') {
@@ -1142,11 +1285,7 @@
 
         function updatePlayer() {
             if (!player.isAlive) {
-                player.respawnTimer--;
-                if (player.respawnTimer <= 0 && lives > 0) {
-                    player.isAlive = true;
-                    player.x = canvas.width / 2 - player.width / 2;
-                }
+                // 리스폰은 RESTART 버튼을 눌러야만 됨
                 return;
             }
 
@@ -1236,12 +1375,24 @@
         function playerHit() {
             lives--;
             player.isAlive = false;
-            player.respawnTimer = 120;
             createExplosion(player.x + player.width / 2, player.y + player.height / 2, '#00ffff');
             playPlayerHitSound();
 
             if (lives <= 0) {
                 gameOver();
+            } else {
+                // FIRE 버튼을 RESTART로 변경
+                fireBtn.textContent = 'RESTART';
+            }
+        }
+
+        function respawnPlayer() {
+            if (!player.isAlive && lives > 0) {
+                player.isAlive = true;
+                player.x = canvas.width / 2 - player.width / 2;
+                player.y = canvas.height - 200;
+                // RESTART 버튼을 FIRE로 변경
+                fireBtn.textContent = 'FIRE';
             }
         }
 
