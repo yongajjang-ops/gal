@@ -1491,8 +1491,17 @@
 
             if (keys.fire && canFire && player.bullets.length < player.maxBullets) {
                 const scale = getScaleFactor();
+                const bulletSpacing = 10 * scale;
+                // 좌측 총알
                 player.bullets.push({
-                    x: player.x + player.width / 2,
+                    x: player.x + player.width / 2 - bulletSpacing,
+                    y: player.y,
+                    width: 4 * scale,
+                    height: 12 * scale
+                });
+                // 우측 총알
+                player.bullets.push({
+                    x: player.x + player.width / 2 + bulletSpacing,
                     y: player.y,
                     width: 4 * scale,
                     height: 12 * scale
