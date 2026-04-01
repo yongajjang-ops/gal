@@ -937,7 +937,6 @@
                 // RESTART 상태일 때 리스폰
                 if (!player.isAlive && lives > 0 && gameState === 'playing') {
                     respawnPlayer();
-                    return;
                 }
 
                 keys.fire = true;
@@ -981,7 +980,6 @@
                 // RESTART 상태일 때 리스폰
                 if (!player.isAlive && lives > 0 && gameState === 'playing') {
                     respawnPlayer();
-                    return;
                 }
 
                 keys.fire = true;
