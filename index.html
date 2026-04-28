@@ -2,14 +2,14 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>갤러그 - Galaga</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <title>갤러그 모바일 - Galaga Mobile</title>
     <link rel="manifest" href="manifest.json">
     <link rel="icon" type="image/svg+xml" href="icon.svg">
     <link rel="apple-touch-icon" href="icon.svg">
     <meta name="theme-color" content="#000000">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-title" content="갤러그">
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
     <style>
@@ -17,57 +17,35 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            touch-action: none;
         }
 
         body {
             background-color: #000;
             display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
+            flex-direction: column;
             font-family: 'Press Start 2P', 'Courier New', monospace;
-            overflow: hidden;
         }
 
         .game-container {
             position: relative;
+            flex: 1;
             display: flex;
             flex-direction: column;
-            align-items: center;
+            max-height: 100vh;
         }
 
         #gameCanvas {
-            border: 3px solid #333;
+            width: 100%;
+            flex: 1;
             background-color: #000;
-        }
-
-        .ui-panel {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            right: 10px;
-            display: flex;
-            justify-content: space-between;
-            color: #fff;
-            font-size: 14px;
-            z-index: 10;
-            pointer-events: none;
-        }
-
-        .score-display {
-            color: #ff0000;
-        }
-
-        .high-score {
-            color: #ff0000;
-        }
-
-        .lives-display {
-            color: #00ffff;
-        }
-
-        .stage-display {
-            color: #ffff00;
         }
 
         #startScreen, #gameOverScreen {
@@ -80,14 +58,15 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            background: rgba(0, 0, 0, 0.9);
+            background: rgba(0, 0, 0, 0.95);
             z-index: 100;
+            padding: 20px;
         }
 
         #startScreen h1 {
             color: #ff0000;
-            font-size: 48px;
-            margin-bottom: 20px;
+            font-size: 28px;
+            margin-bottom: 10px;
             text-shadow: 0 0 20px #ff0000;
             animation: glow 1.5s ease-in-out infinite alternate;
         }
@@ -99,8 +78,9 @@
 
         #startScreen p, #gameOverScreen p {
             color: #fff;
-            font-size: 16px;
-            margin: 10px 0;
+            font-size: 12px;
+            margin: 8px 0;
+            text-align: center;
         }
 
         .blink {
@@ -113,48 +93,42 @@
 
         #gameOverScreen h2 {
             color: #ff0000;
-            font-size: 36px;
-            margin-bottom: 20px;
-        }
-
-        .controls-info {
-            margin-top: 30px;
-            color: #00ff00;
-            font-size: 12px;
-            text-align: center;
-            line-height: 2;
+            font-size: 24px;
+            margin-bottom: 15px;
         }
 
         .speed-selector {
-            margin-top: 30px;
+            margin-top: 20px;
             text-align: center;
+            width: 100%;
         }
 
         .speed-selector h3 {
             color: #ffff00;
-            font-size: 14px;
-            margin-bottom: 15px;
+            font-size: 12px;
+            margin-bottom: 10px;
         }
 
         .speed-buttons {
             display: flex;
             justify-content: center;
-            gap: 10px;
+            gap: 8px;
             flex-wrap: wrap;
         }
 
         .speed-btn {
-            padding: 10px 20px;
-            font-size: 12px;
+            padding: 12px 16px;
+            font-size: 10px;
             font-family: 'Press Start 2P', 'Courier New', monospace;
             border: 2px solid #00ff00;
             background: rgba(0, 255, 0, 0.1);
             color: #00ff00;
             cursor: pointer;
             transition: all 0.3s;
+            border-radius: 8px;
         }
 
-        .speed-btn:hover {
+        .speed-btn:hover, .speed-btn:active {
             background: rgba(0, 255, 0, 0.3);
         }
 
@@ -164,41 +138,69 @@
             color: #ffffff;
         }
 
-        .speed-indicator {
-            position: absolute;
-            bottom: 10px;
-            right: 10px;
+        .controls-info {
+            margin-top: 20px;
             color: #00ff00;
             font-size: 10px;
-            z-index: 10;
+            text-align: center;
+            line-height: 1.8;
         }
 
-        @media (max-width: 600px) {
-            .speed-btn {
-                padding: 8px 12px;
-                font-size: 10px;
-            }
+        .sound-toggle {
+            margin-top: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .sound-toggle-btn {
+            padding: 12px 20px;
+            font-size: 12px;
+            font-family: 'Press Start 2P', 'Courier New', monospace;
+            border: 2px solid #00ffff;
+            background: rgba(0, 255, 255, 0.1);
+            color: #00ffff;
+            cursor: pointer;
+            transition: all 0.3s;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .sound-toggle-btn:hover, .sound-toggle-btn:active {
+            background: rgba(0, 255, 255, 0.3);
+        }
+
+        .sound-toggle-btn.muted {
+            border-color: #ff4444;
+            background: rgba(255, 68, 68, 0.1);
+            color: #ff4444;
+        }
+
+        .sound-toggle-btn.muted:hover, .sound-toggle-btn.muted:active {
+            background: rgba(255, 68, 68, 0.3);
+        }
+
+        .sound-icon {
+            font-size: 16px;
         }
 
         .mobile-controls {
-            display: none;
-            position: fixed;
-            bottom: 20px;
-            left: 0;
-            right: 0;
-            padding: 0 20px;
-            z-index: 50;
-        }
-
-        .control-row {
             display: flex;
-            justify-content: space-between;
+            justify-content: center;
             align-items: center;
+            padding: 15px 20px;
+            background: rgba(0, 0, 0, 0.9);
+            border-top: 2px solid #333;
+            height: 120px;
+            flex-shrink: 0;
         }
 
         .move-buttons {
             display: flex;
-            gap: 10px;
+            gap: 15px;
         }
 
         .control-btn {
@@ -208,7 +210,7 @@
             border: 3px solid #00ff00;
             background: rgba(0, 255, 0, 0.2);
             color: #00ff00;
-            font-size: 24px;
+            font-size: 28px;
             font-weight: bold;
             touch-action: manipulation;
             user-select: none;
@@ -217,8 +219,9 @@
             align-items: center;
         }
 
-        .control-btn:active {
+        .control-btn:active, .control-btn.active {
             background: rgba(0, 255, 0, 0.5);
+            transform: scale(0.95);
         }
 
         .fire-btn {
@@ -227,53 +230,153 @@
             border-color: #ff0000;
             background: rgba(255, 0, 0, 0.2);
             color: #ff0000;
+            font-size: 14px;
+            font-family: 'Press Start 2P', 'Courier New', monospace;
         }
 
-        .fire-btn:active {
+        .fire-btn:active, .fire-btn.active {
             background: rgba(255, 0, 0, 0.5);
         }
 
-        @media (max-width: 600px) {
-            .mobile-controls {
-                display: block;
-            }
-            #startScreen h1 {
-                font-size: 32px;
-            }
-            .controls-info {
-                font-size: 10px;
-            }
+        .speed-indicator {
+            position: absolute;
+            top: 45px;
+            right: 10px;
+            color: #00ff00;
+            font-size: 8px;
+            z-index: 10;
         }
 
-        @media (pointer: coarse) {
-            .mobile-controls {
-                display: block;
-            }
+        .start-btn {
+            margin-top: 25px;
+            padding: 18px 40px;
+            font-size: 14px;
+            font-family: 'Press Start 2P', 'Courier New', monospace;
+            border: 3px solid #ffff00;
+            background: rgba(255, 255, 0, 0.2);
+            color: #ffff00;
+            cursor: pointer;
+            border-radius: 10px;
+            animation: blink 1s step-start infinite;
+        }
+
+        .start-btn:active {
+            background: rgba(255, 255, 0, 0.5);
+        }
+
+        .top-buttons {
+            position: absolute;
+            bottom: 130px;
+            right: 10px;
+            display: flex;
+            gap: 10px;
+            z-index: 95;
+        }
+
+        .icon-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            border: 2px solid #888;
+            background: rgba(0, 0, 0, 0.7);
+            color: #fff;
+            font-size: 18px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            touch-action: manipulation;
+        }
+
+        .icon-btn:active {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .icon-btn.muted {
+            color: #ff4444;
+            border-color: #ff4444;
+        }
+
+        .icon-btn.paused {
+            color: #ffff00;
+            border-color: #ffff00;
+            background: rgba(255, 255, 0, 0.3);
+        }
+
+        #stopBtn {
+            color: #ff6666;
+            border-color: #ff6666;
+        }
+
+        #stopBtn:active {
+            background: rgba(255, 100, 100, 0.5);
+        }
+
+        #pauseScreen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 90;
+        }
+
+        #pauseScreen h2 {
+            color: #ffff00;
+            font-size: 28px;
+            text-shadow: 0 0 20px #ffff00;
+            animation: blink 1s step-start infinite;
+        }
+
+        #pauseScreen p {
+            color: #fff;
+            font-size: 12px;
+            margin-top: 20px;
         }
     </style>
 </head>
 <body>
     <div class="game-container">
-        <canvas id="gameCanvas" width="480" height="640"></canvas>
+        <canvas id="gameCanvas"></canvas>
+
+        <div class="top-buttons">
+            <button class="icon-btn" id="fullscreenBtn" title="전체화면">⛶</button>
+            <button class="icon-btn" id="muteBtn" title="음소거">🔊</button>
+            <button class="icon-btn game-btn" id="pauseBtn" title="일시정지" style="display: none;">⏸</button>
+            <button class="icon-btn game-btn" id="stopBtn" title="게임종료" style="display: none;">⏹</button>
+        </div>
 
         <div id="startScreen">
             <h1>GALAGA</h1>
-            <p style="color: #ffff00;">- 1981 ARCADE CLASSIC -</p>
-            <p class="blink" style="margin-top: 40px;">PRESS SPACE OR TAP TO START</p>
+            <p style="color: #ffff00;">- MOBILE EDITION -</p>
+
             <div class="speed-selector">
-                <h3>게임 속도 선택 / SPEED</h3>
+                <h3>게임 속도 / SPEED</h3>
                 <div class="speed-buttons">
-                    <button class="speed-btn" data-speed="0.5">느림<br>SLOW</button>
-                    <button class="speed-btn selected" data-speed="1">보통<br>NORMAL</button>
-                    <button class="speed-btn" data-speed="1.5">빠름<br>FAST</button>
-                    <button class="speed-btn" data-speed="2">매우빠름<br>EXTREME</button>
+                    <button class="speed-btn" data-speed="0.5">느림</button>
+                    <button class="speed-btn selected" data-speed="1">보통</button>
+                    <button class="speed-btn" data-speed="1.5">빠름</button>
+                    <button class="speed-btn" data-speed="2">극한</button>
                 </div>
             </div>
+
+            <div class="sound-toggle">
+                <button class="sound-toggle-btn" id="startSoundBtn">
+                    <span class="sound-icon">🔊</span>
+                    <span id="soundBtnText">SOUND ON</span>
+                </button>
+            </div>
+
+            <button class="start-btn" id="startBtn">START</button>
+
             <div class="controls-info">
-                <p>← → : 이동 / MOVE</p>
-                <p>SPACE : 발사 / FIRE</p>
-                <p>1~4 : 속도 변경 (게임 중)</p>
-                <p>적을 모두 물리치고 스테이지를 클리어하세요!</p>
+                <p>화면을 좌우로 드래그하여 이동</p>
+                <p>FIRE 버튼으로 발사</p>
             </div>
         </div>
 
@@ -281,32 +384,46 @@
             <h2>GAME OVER</h2>
             <p>SCORE: <span id="finalScore">0</span></p>
             <p>STAGE: <span id="finalStage">1</span></p>
-            <p class="blink" style="margin-top: 30px;">PRESS SPACE OR TAP TO RESTART</p>
+            <button class="start-btn" id="restartBtn">RESTART</button>
+        </div>
+
+        <div id="pauseScreen" style="display: none;">
+            <h2>PAUSED</h2>
+            <p>일시정지 버튼을 눌러 계속하기</p>
         </div>
 
         <div class="speed-indicator" id="speedIndicator" style="display: none;">
             SPEED: <span id="currentSpeed">NORMAL</span>
         </div>
 
-        <div class="mobile-controls">
-            <div class="control-row">
-                <div class="move-buttons">
-                    <button class="control-btn" id="leftBtn">◀</button>
-                    <button class="control-btn" id="rightBtn">▶</button>
-                </div>
-                <button class="control-btn fire-btn" id="fireBtn">FIRE</button>
-            </div>
+        <div class="mobile-controls" id="mobileControls" style="display: none;">
+            <button class="control-btn fire-btn" id="fireBtn">FIRE</button>
         </div>
     </div>
 
     <script>
+        // ==================== 캔버스 크기 설정 ====================
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        function resizeCanvas() {
+            const container = document.querySelector('.game-container');
+            const controls = document.getElementById('mobileControls');
+            const controlsHeight = controls.style.display === 'none' ? 0 : 120;
+
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight - controlsHeight;
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
         // ==================== 사운드 시스템 ====================
         const AudioContext = window.AudioContext || window.webkitAudioContext;
         let audioCtx = null;
         let bgmPlaying = false;
         let bgmInterval = null;
 
-        // 오디오 컨텍스트 초기화 (사용자 인터랙션 후)
         function initAudio() {
             if (!audioCtx) {
                 audioCtx = new AudioContext();
@@ -316,9 +433,8 @@
             }
         }
 
-        // 기본 사운드 생성 함수
         function playTone(frequency, duration, type = 'square', volume = 0.3, delay = 0) {
-            if (!audioCtx) return;
+            if (!audioCtx || isMuted) return;
 
             const oscillator = audioCtx.createOscillator();
             const gainNode = audioCtx.createGain();
@@ -336,18 +452,15 @@
             oscillator.stop(audioCtx.currentTime + delay + duration);
         }
 
-        // 플레이어 발사음
         function playShootSound() {
-            if (!audioCtx) return;
+            if (!audioCtx || isMuted) return;
             playTone(880, 0.1, 'square', 0.2);
             playTone(440, 0.05, 'square', 0.15, 0.05);
         }
 
-        // 적 폭발음
         function playExplosionSound() {
-            if (!audioCtx) return;
+            if (!audioCtx || isMuted) return;
 
-            // 노이즈 생성
             const bufferSize = audioCtx.sampleRate * 0.2;
             const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
             const output = buffer.getChannelData(0);
@@ -376,16 +489,13 @@
             noise.start();
             noise.stop(audioCtx.currentTime + 0.2);
 
-            // 저음 추가
             playTone(150, 0.15, 'sine', 0.3);
             playTone(80, 0.2, 'sine', 0.2, 0.05);
         }
 
-        // 플레이어 피격음
         function playPlayerHitSound() {
-            if (!audioCtx) return;
+            if (!audioCtx || isMuted) return;
 
-            // 큰 폭발음
             const bufferSize = audioCtx.sampleRate * 0.5;
             const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
             const output = buffer.getChannelData(0);
@@ -414,7 +524,6 @@
             noise.start();
             noise.stop(audioCtx.currentTime + 0.5);
 
-            // 하강 톤
             const osc = audioCtx.createOscillator();
             const oscGain = audioCtx.createGain();
             osc.connect(oscGain);
@@ -428,98 +537,84 @@
             osc.stop(audioCtx.currentTime + 0.4);
         }
 
-        // 적 발사음
         function playEnemyShootSound() {
-            if (!audioCtx) return;
+            if (!audioCtx || isMuted) return;
             playTone(200, 0.1, 'sawtooth', 0.1);
             playTone(150, 0.08, 'square', 0.08, 0.03);
         }
 
-        // 스테이지 클리어 사운드
         function playStageClearSound() {
-            if (!audioCtx) return;
-            const notes = [523, 659, 784, 1047]; // C5, E5, G5, C6
+            if (!audioCtx || isMuted) return;
+            const notes = [523, 659, 784, 1047];
             notes.forEach((freq, i) => {
                 playTone(freq, 0.3, 'square', 0.25, i * 0.15);
             });
         }
 
-        // 게임 오버 사운드
         function playGameOverSound() {
-            if (!audioCtx) return;
             stopBGM();
-            const notes = [392, 349, 330, 294, 262]; // G4 -> C4 하강
+            if (!audioCtx || isMuted) return;
+            const notes = [392, 349, 330, 294, 262];
             notes.forEach((freq, i) => {
                 playTone(freq, 0.4, 'square', 0.25, i * 0.3);
             });
         }
 
-        // 게임 시작 사운드
         function playStartSound() {
-            if (!audioCtx) return;
-            const notes = [262, 330, 392, 523]; // C4, E4, G4, C5
+            if (!audioCtx || isMuted) return;
+            const notes = [262, 330, 392, 523];
             notes.forEach((freq, i) => {
                 playTone(freq, 0.15, 'square', 0.2, i * 0.1);
             });
         }
 
-        // 배경음악 (갤러그 스타일 BGM)
         function startBGM() {
-            if (!audioCtx || bgmPlaying) return;
+            if (!audioCtx || bgmPlaying || isMuted) return;
             bgmPlaying = true;
 
-            // 갤러그 스타일 멜로디 패턴
             const melody = [
-                // 메인 테마 패턴 1
-                { note: 330, duration: 0.15 }, // E4
                 { note: 330, duration: 0.15 },
-                { note: 392, duration: 0.15 }, // G4
-                { note: 440, duration: 0.15 }, // A4
-                { note: 523, duration: 0.3 },  // C5
-                { note: 440, duration: 0.15 }, // A4
-                { note: 392, duration: 0.3 },  // G4
-                { note: 0, duration: 0.15 },   // 쉼표
-
-                // 패턴 2
-                { note: 330, duration: 0.15 }, // E4
-                { note: 392, duration: 0.15 }, // G4
-                { note: 440, duration: 0.15 }, // A4
-                { note: 392, duration: 0.15 }, // G4
-                { note: 330, duration: 0.3 },  // E4
-                { note: 294, duration: 0.15 }, // D4
-                { note: 262, duration: 0.3 },  // C4
-                { note: 0, duration: 0.15 },   // 쉼표
-
-                // 패턴 3 - 긴장감
-                { note: 392, duration: 0.15 }, // G4
+                { note: 330, duration: 0.15 },
                 { note: 392, duration: 0.15 },
-                { note: 440, duration: 0.15 }, // A4
-                { note: 494, duration: 0.15 }, // B4
-                { note: 523, duration: 0.3 },  // C5
-                { note: 587, duration: 0.15 }, // D5
-                { note: 523, duration: 0.3 },  // C5
+                { note: 440, duration: 0.15 },
+                { note: 523, duration: 0.3 },
+                { note: 440, duration: 0.15 },
+                { note: 392, duration: 0.3 },
                 { note: 0, duration: 0.15 },
-
-                // 패턴 4 - 하강
-                { note: 494, duration: 0.15 }, // B4
-                { note: 440, duration: 0.15 }, // A4
-                { note: 392, duration: 0.15 }, // G4
-                { note: 330, duration: 0.15 }, // E4
-                { note: 294, duration: 0.3 },  // D4
-                { note: 262, duration: 0.3 },  // C4
+                { note: 330, duration: 0.15 },
+                { note: 392, duration: 0.15 },
+                { note: 440, duration: 0.15 },
+                { note: 392, duration: 0.15 },
+                { note: 330, duration: 0.3 },
+                { note: 294, duration: 0.15 },
+                { note: 262, duration: 0.3 },
+                { note: 0, duration: 0.15 },
+                { note: 392, duration: 0.15 },
+                { note: 392, duration: 0.15 },
+                { note: 440, duration: 0.15 },
+                { note: 494, duration: 0.15 },
+                { note: 523, duration: 0.3 },
+                { note: 587, duration: 0.15 },
+                { note: 523, duration: 0.3 },
+                { note: 0, duration: 0.15 },
+                { note: 494, duration: 0.15 },
+                { note: 440, duration: 0.15 },
+                { note: 392, duration: 0.15 },
+                { note: 330, duration: 0.15 },
+                { note: 294, duration: 0.3 },
+                { note: 262, duration: 0.3 },
                 { note: 0, duration: 0.3 },
             ];
 
-            // 베이스 라인
             const bassLine = [
-                { note: 131, duration: 0.3 }, // C3
                 { note: 131, duration: 0.3 },
-                { note: 165, duration: 0.3 }, // E3
+                { note: 131, duration: 0.3 },
                 { note: 165, duration: 0.3 },
-                { note: 196, duration: 0.3 }, // G3
+                { note: 165, duration: 0.3 },
                 { note: 196, duration: 0.3 },
-                { note: 165, duration: 0.3 }, // E3
-                { note: 147, duration: 0.3 }, // D3
+                { note: 196, duration: 0.3 },
+                { note: 165, duration: 0.3 },
+                { note: 147, duration: 0.3 },
             ];
 
             let melodyIndex = 0;
@@ -527,15 +622,9 @@
             let melodyTime = 0;
             let bassTime = 0;
 
-            const tempo = 180; // BPM
-            const beatDuration = 60 / tempo;
-
             function playBGMNote() {
                 if (!bgmPlaying || !audioCtx) return;
 
-                const currentTime = audioCtx.currentTime;
-
-                // 멜로디 재생
                 if (melodyTime <= 0) {
                     const note = melody[melodyIndex];
                     if (note.note > 0) {
@@ -545,7 +634,6 @@
                     melodyIndex = (melodyIndex + 1) % melody.length;
                 }
 
-                // 베이스 재생
                 if (bassTime <= 0) {
                     const bass = bassLine[bassIndex];
                     if (bass.note > 0) {
@@ -571,31 +659,25 @@
             }
         }
 
-        // 보너스 점수 사운드
         function playBonusSound() {
-            if (!audioCtx) return;
+            if (!audioCtx || isMuted) return;
             playTone(784, 0.1, 'square', 0.2);
             playTone(988, 0.1, 'square', 0.2, 0.1);
             playTone(1175, 0.15, 'square', 0.25, 0.2);
         }
 
-        // ==================== 캔버스 설정 ====================
-        const canvas = document.getElementById('gameCanvas');
-        const ctx = canvas.getContext('2d');
-
-        // 게임 상태
-        let gameState = 'start'; // start, playing, gameover
+        // ==================== 게임 상태 ====================
+        let gameState = 'start';
         let score = 0;
-        let highScore = localStorage.getItem('galagaHighScore') || 0;
+        let highScore = localStorage.getItem('galagaMobileHighScore') || 0;
         let lives = 10;
         let stage = 1;
-        let gameLoop;
+        let isMuted = false;
 
-        // 속도 조절 설정
-        let gameSpeed = 1; // 기본 속도 배율
+        // 속도 조절
+        let gameSpeed = 1;
         const speedNames = { 0.5: 'SLOW', 1: 'NORMAL', 1.5: 'FAST', 2: 'EXTREME' };
 
-        // 속도 버튼 이벤트
         document.querySelectorAll('.speed-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 e.stopPropagation();
@@ -610,48 +692,47 @@
             document.getElementById('currentSpeed').textContent = speedNames[gameSpeed] || gameSpeed.toFixed(1);
         }
 
-        // 플레이어 설정
+        // 플레이어 설정 (화면 크기에 비례)
+        function getScaleFactor() {
+            return Math.min(canvas.width / 480, canvas.height / 640);
+        }
+
         const player = {
-            x: canvas.width / 2 - 20,
-            y: canvas.height - 80,
+            x: 0,
+            y: 0,
             width: 40,
             height: 40,
             speed: 5,
             bullets: [],
             maxBullets: 10,
             isAlive: true,
-            respawnTimer: 0,
             captured: false
         };
 
-        // 적 설정
         let enemies = [];
         let enemyBullets = [];
-        let attackingEnemies = [];
-        let bossWithCapturedShip = null;
+        let particles = [];
 
-        // 적 편대 설정
         const formation = {
-            x: 40,
-            y: 60,
+            x: 0,
+            y: 0,
             direction: 1,
             speed: 0.5,
             moveTimer: 0
         };
 
-        // 파티클 효과
-        let particles = [];
-        let explosions = [];
-
-        // 별 배경
         let stars = [];
-        for (let i = 0; i < 100; i++) {
-            stars.push({
-                x: Math.random() * canvas.width,
-                y: Math.random() * canvas.height,
-                size: Math.random() * 2 + 0.5,
-                speed: Math.random() * 2 + 0.5
-            });
+
+        function initStars() {
+            stars = [];
+            for (let i = 0; i < 100; i++) {
+                stars.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    size: Math.random() * 2 + 0.5,
+                    speed: Math.random() * 2 + 0.5
+                });
+            }
         }
 
         // 입력 처리
@@ -662,126 +743,347 @@
         };
 
         let canFire = true;
-        let fireDelay = 150; // 연속 발사 딜레이 (ms)
-
-        // 키보드 이벤트
-        document.addEventListener('keydown', (e) => {
-            if (e.code === 'ArrowLeft') keys.left = true;
-            if (e.code === 'ArrowRight') keys.right = true;
-            if (e.code === 'Space') {
-                e.preventDefault();
-                if (gameState === 'start' || gameState === 'gameover') {
-                    startGame();
-                } else if (gameState === 'playing') {
-                    keys.fire = true;
-                }
-            }
-            // 게임 중 속도 변경 (1~4 키)
-            if (e.code === 'Digit1' || e.code === 'Numpad1') {
-                setGameSpeed(0.5);
-            } else if (e.code === 'Digit2' || e.code === 'Numpad2') {
-                setGameSpeed(1);
-            } else if (e.code === 'Digit3' || e.code === 'Numpad3') {
-                setGameSpeed(1.5);
-            } else if (e.code === 'Digit4' || e.code === 'Numpad4') {
-                setGameSpeed(2);
-            }
-        });
-
-        function setGameSpeed(speed) {
-            gameSpeed = speed;
-            document.querySelectorAll('.speed-btn').forEach(btn => {
-                btn.classList.remove('selected');
-                if (parseFloat(btn.dataset.speed) === speed) {
-                    btn.classList.add('selected');
-                }
-            });
-            updateSpeedIndicator();
-        }
-
-        document.addEventListener('keyup', (e) => {
-            if (e.code === 'ArrowLeft') keys.left = false;
-            if (e.code === 'ArrowRight') keys.right = false;
-            if (e.code === 'Space') keys.fire = false;
-        });
-
-        // 터치/클릭 이벤트
-        canvas.addEventListener('click', () => {
-            initAudio();
-            if (gameState === 'start' || gameState === 'gameover') {
-                startGame();
-            }
-        });
-
-        // 터치 시작 시 오디오 초기화
-        document.addEventListener('touchstart', () => {
-            initAudio();
-        }, { once: true });
+        let fireDelay = 150;
 
         // 모바일 컨트롤
-        const leftBtn = document.getElementById('leftBtn');
-        const rightBtn = document.getElementById('rightBtn');
         const fireBtn = document.getElementById('fireBtn');
+        const startBtn = document.getElementById('startBtn');
+        const restartBtn = document.getElementById('restartBtn');
+        const fullscreenBtn = document.getElementById('fullscreenBtn');
+        const muteBtn = document.getElementById('muteBtn');
+        const pauseBtn = document.getElementById('pauseBtn');
+        const stopBtn = document.getElementById('stopBtn');
+        const pauseScreen = document.getElementById('pauseScreen');
+        const startSoundBtn = document.getElementById('startSoundBtn');
+        const soundBtnText = document.getElementById('soundBtnText');
+        const soundIcon = startSoundBtn.querySelector('.sound-icon');
 
-        leftBtn.addEventListener('touchstart', (e) => { e.preventDefault(); keys.left = true; });
-        leftBtn.addEventListener('touchend', (e) => { e.preventDefault(); keys.left = false; });
-        rightBtn.addEventListener('touchstart', (e) => { e.preventDefault(); keys.right = true; });
-        rightBtn.addEventListener('touchend', (e) => { e.preventDefault(); keys.right = false; });
-        fireBtn.addEventListener('touchstart', (e) => { e.preventDefault(); keys.fire = true; });
-        fireBtn.addEventListener('touchend', (e) => { e.preventDefault(); keys.fire = false; });
+        // 전체화면 기능
+        fullscreenBtn.addEventListener('click', () => {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(err => {
+                    console.log('전체화면 전환 실패:', err);
+                });
+                fullscreenBtn.textContent = '⛶';
+            } else {
+                document.exitFullscreen();
+                fullscreenBtn.textContent = '⛶';
+            }
+        });
 
-        // 적 타입 정의
+        // 음소거 상태 UI 업데이트 함수
+        function updateMuteUI() {
+            if (isMuted) {
+                muteBtn.textContent = '🔇';
+                muteBtn.classList.add('muted');
+                soundIcon.textContent = '🔇';
+                soundBtnText.textContent = 'SOUND OFF';
+                startSoundBtn.classList.add('muted');
+            } else {
+                muteBtn.textContent = '🔊';
+                muteBtn.classList.remove('muted');
+                soundIcon.textContent = '🔊';
+                soundBtnText.textContent = 'SOUND ON';
+                startSoundBtn.classList.remove('muted');
+            }
+        }
+
+        // 음소거 토글 함수
+        function toggleMute() {
+            isMuted = !isMuted;
+            updateMuteUI();
+            if (isMuted) {
+                stopBGM();
+            } else {
+                if (gameState === 'playing') {
+                    startBGM();
+                }
+            }
+        }
+
+        // 음소거 기능 (게임 중 버튼)
+        muteBtn.addEventListener('click', toggleMute);
+
+        // 초기 화면 사운드 버튼
+        startSoundBtn.addEventListener('click', () => {
+            initAudio();
+            toggleMute();
+        });
+
+        // 일시정지 기능
+        pauseBtn.addEventListener('click', () => {
+            if (gameState === 'playing') {
+                pauseGame();
+            } else if (gameState === 'paused') {
+                resumeGame();
+            }
+        });
+
+        // 게임 중지 기능
+        stopBtn.addEventListener('click', () => {
+            if (gameState === 'playing' || gameState === 'paused') {
+                stopGame();
+            }
+        });
+
+        function pauseGame() {
+            gameState = 'paused';
+            stopBGM();
+            pauseBtn.textContent = '▶';
+            pauseBtn.classList.add('paused');
+            pauseScreen.style.display = 'flex';
+        }
+
+        function resumeGame() {
+            gameState = 'playing';
+            if (!isMuted) {
+                startBGM();
+            }
+            pauseBtn.textContent = '⏸';
+            pauseBtn.classList.remove('paused');
+            pauseScreen.style.display = 'none';
+        }
+
+        function stopGame() {
+            gameState = 'start';
+            stopBGM();
+
+            // UI 초기화
+            pauseScreen.style.display = 'none';
+            document.getElementById('mobileControls').style.display = 'none';
+            document.getElementById('speedIndicator').style.display = 'none';
+            pauseBtn.style.display = 'none';
+            stopBtn.style.display = 'none';
+            pauseBtn.textContent = '⏸';
+            pauseBtn.classList.remove('paused');
+
+            // 시작 화면 표시
+            document.getElementById('startScreen').style.display = 'flex';
+            resizeCanvas();
+        }
+
+        // pauseScreen 클릭 시 게임 재개
+        pauseScreen.addEventListener('click', () => {
+            if (gameState === 'paused') {
+                resumeGame();
+            }
+        });
+
+        // 터치 드래그로 우주선 이동 (좌우 + 상하)
+        let touchStartX = 0;
+        let touchStartY = 0;
+        let playerStartX = 0;
+        let playerStartY = 0;
+        let isDragging = false;
+
+        // Y좌표 제한 (화면 상단~하단 범위)
+        const minY = 100;
+        const maxY = () => canvas.height - 50;
+
+        canvas.addEventListener('touchstart', (e) => {
+            if (gameState !== 'playing') return;
+            e.preventDefault();
+            const touch = e.touches[0];
+            touchStartX = touch.clientX;
+            touchStartY = touch.clientY;
+            playerStartX = player.x;
+            playerStartY = player.y;
+            isDragging = true;
+        }, { passive: false });
+
+        canvas.addEventListener('touchmove', (e) => {
+            if (!isDragging || gameState !== 'playing') return;
+            e.preventDefault();
+            const touch = e.touches[0];
+            const deltaX = touch.clientX - touchStartX;
+            const deltaY = touch.clientY - touchStartY;
+            player.x = Math.max(10, Math.min(canvas.width - player.width - 10, playerStartX + deltaX));
+            player.y = Math.max(minY, Math.min(maxY(), playerStartY + deltaY));
+        }, { passive: false });
+
+        canvas.addEventListener('touchend', () => {
+            isDragging = false;
+        });
+
+        canvas.addEventListener('touchcancel', () => {
+            isDragging = false;
+        });
+
+        // 마우스 드래그 (데스크탑 테스트용)
+        canvas.addEventListener('mousedown', (e) => {
+            if (gameState !== 'playing') return;
+            touchStartX = e.clientX;
+            touchStartY = e.clientY;
+            playerStartX = player.x;
+            playerStartY = player.y;
+            isDragging = true;
+        });
+
+        canvas.addEventListener('mousemove', (e) => {
+            if (!isDragging || gameState !== 'playing') return;
+            const deltaX = e.clientX - touchStartX;
+            const deltaY = e.clientY - touchStartY;
+            player.x = Math.max(10, Math.min(canvas.width - player.width - 10, playerStartX + deltaX));
+            player.y = Math.max(minY, Math.min(maxY(), playerStartY + deltaY));
+        });
+
+        canvas.addEventListener('mouseup', () => {
+            isDragging = false;
+        });
+
+        canvas.addEventListener('mouseleave', () => {
+            isDragging = false;
+        });
+
+        // FIRE 버튼 설정 (발사 + 드래그 이동)
+        function setupFireButton(btn) {
+            btn.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+
+                // RESTART 상태일 때 리스폰
+                if (!player.isAlive && lives > 0 && gameState === 'playing') {
+                    respawnPlayer();
+                }
+
+                keys.fire = true;
+                btn.classList.add('active');
+                // 드래그 시작
+                if (gameState === 'playing') {
+                    const touch = e.touches[0];
+                    touchStartX = touch.clientX;
+                    touchStartY = touch.clientY;
+                    playerStartX = player.x;
+                    playerStartY = player.y;
+                    isDragging = true;
+                }
+            }, { passive: false });
+            btn.addEventListener('touchmove', (e) => {
+                e.preventDefault();
+                // 드래그 이동
+                if (isDragging && gameState === 'playing') {
+                    const touch = e.touches[0];
+                    const deltaX = touch.clientX - touchStartX;
+                    const deltaY = touch.clientY - touchStartY;
+                    player.x = Math.max(10, Math.min(canvas.width - player.width - 10, playerStartX + deltaX));
+                    player.y = Math.max(minY, Math.min(maxY(), playerStartY + deltaY));
+                }
+            }, { passive: false });
+            btn.addEventListener('touchend', (e) => {
+                e.preventDefault();
+                keys.fire = false;
+                btn.classList.remove('active');
+                isDragging = false;
+            }, { passive: false });
+            btn.addEventListener('touchcancel', (e) => {
+                e.preventDefault();
+                keys.fire = false;
+                btn.classList.remove('active');
+                isDragging = false;
+            }, { passive: false });
+            btn.addEventListener('mousedown', (e) => {
+                e.preventDefault();
+
+                // RESTART 상태일 때 리스폰
+                if (!player.isAlive && lives > 0 && gameState === 'playing') {
+                    respawnPlayer();
+                }
+
+                keys.fire = true;
+                btn.classList.add('active');
+                if (gameState === 'playing') {
+                    touchStartX = e.clientX;
+                    touchStartY = e.clientY;
+                    playerStartX = player.x;
+                    playerStartY = player.y;
+                    isDragging = true;
+                }
+            });
+            btn.addEventListener('mousemove', (e) => {
+                if (isDragging && gameState === 'playing') {
+                    const deltaX = e.clientX - touchStartX;
+                    const deltaY = e.clientY - touchStartY;
+                    player.x = Math.max(10, Math.min(canvas.width - player.width - 10, playerStartX + deltaX));
+                    player.y = Math.max(minY, Math.min(maxY(), playerStartY + deltaY));
+                }
+            });
+            btn.addEventListener('mouseup', (e) => {
+                e.preventDefault();
+                keys.fire = false;
+                btn.classList.remove('active');
+                isDragging = false;
+            });
+            btn.addEventListener('mouseleave', () => {
+                keys.fire = false;
+                btn.classList.remove('active');
+                isDragging = false;
+            });
+        }
+
+        setupFireButton(fireBtn);
+
+        startBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            initAudio();
+            startGame();
+        });
+
+        restartBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            startGame();
+        });
+
+        // 적 타입
         const enemyTypes = {
             bee: { width: 30, height: 30, points: 50, color: '#ffff00', health: 1 },
             butterfly: { width: 30, height: 30, points: 80, color: '#ff00ff', health: 1 },
             boss: { width: 36, height: 36, points: 150, color: '#00ff00', health: 2, canCapture: true }
         };
 
-        // 스테이지 초기화
         function initStage() {
             enemies = [];
             enemyBullets = [];
-            attackingEnemies = [];
-            formation.x = 40;
+
+            const scale = getScaleFactor();
+            const spacing = 40 * scale;
+            formation.x = 40 * scale;
             formation.direction = 1;
 
-            // 보스 (상단 2줄)
+            // 보스
             for (let row = 0; row < 2; row++) {
                 for (let col = 0; col < 8; col++) {
-                    enemies.push(createEnemy('boss', col, row));
+                    enemies.push(createEnemy('boss', col, row, scale, spacing));
                 }
             }
 
-            // 나비 (중간 2줄)
+            // 나비
             for (let row = 2; row < 4; row++) {
                 for (let col = 0; col < 10; col++) {
-                    enemies.push(createEnemy('butterfly', col, row));
+                    enemies.push(createEnemy('butterfly', col, row, scale, spacing));
                 }
             }
 
-            // 벌 (하단 2줄)
+            // 벌
             for (let row = 4; row < 6; row++) {
                 for (let col = 0; col < 10; col++) {
-                    enemies.push(createEnemy('bee', col, row));
+                    enemies.push(createEnemy('bee', col, row, scale, spacing));
                 }
             }
         }
 
-        function createEnemy(type, col, row) {
+        function createEnemy(type, col, row, scale, spacing) {
             const typeData = enemyTypes[type];
-            const spacing = 40;
-            const offsetX = type === 'boss' ? 20 : 0;
+            const offsetX = type === 'boss' ? 20 * scale : 0;
 
             return {
                 type: type,
                 x: 0,
                 y: -50,
                 targetX: col * spacing + offsetX,
-                targetY: row * 40 + 50,
+                targetY: row * 40 * scale + 50 * scale,
                 formationCol: col,
                 formationRow: row,
-                width: typeData.width,
-                height: typeData.height,
+                width: typeData.width * scale,
+                height: typeData.height * scale,
                 points: typeData.points,
                 color: typeData.color,
                 health: typeData.health,
@@ -798,53 +1100,70 @@
             };
         }
 
-        // 게임 시작
         function startGame() {
             initAudio();
             gameState = 'playing';
             score = 0;
-            lives = 10;
+            lives = 9;
             stage = 1;
-            player.x = canvas.width / 2 - 20;
-            player.y = canvas.height - 80;
+
+            // 먼저 UI 표시 및 캔버스 크기 조정
+            document.getElementById('startScreen').style.display = 'none';
+            document.getElementById('gameOverScreen').style.display = 'none';
+            document.getElementById('mobileControls').style.display = 'flex';
+            document.getElementById('speedIndicator').style.display = 'block';
+            pauseScreen.style.display = 'none';
+            pauseBtn.style.display = 'flex';
+            stopBtn.style.display = 'flex';
+            pauseBtn.textContent = '⏸';
+            pauseBtn.classList.remove('paused');
+
+            resizeCanvas();
+
+            // 캔버스 크기 조정 후 플레이어 위치 설정
+            const scale = getScaleFactor();
+            player.width = Math.max(40, 40 * scale);
+            player.height = Math.max(40, 40 * scale);
+            player.speed = Math.max(5, 5 * scale);
+            player.x = canvas.width / 2 - player.width / 2;
+            player.y = canvas.height - 200;
             player.isAlive = true;
             player.bullets = [];
             player.captured = false;
             player.maxBullets = 10;
             particles = [];
-            explosions = [];
 
-            document.getElementById('startScreen').style.display = 'none';
-            document.getElementById('gameOverScreen').style.display = 'none';
-            document.getElementById('speedIndicator').style.display = 'block';
+            initStars();
             updateSpeedIndicator();
+
+            // FIRE 버튼 텍스트 초기화
+            fireBtn.textContent = 'FIRE';
 
             playStartSound();
             setTimeout(() => startBGM(), 500);
             initStage();
         }
 
-        // 게임 오버
         function gameOver() {
             gameState = 'gameover';
             stopBGM();
             playGameOverSound();
             if (score > highScore) {
                 highScore = score;
-                localStorage.setItem('galagaHighScore', highScore);
+                localStorage.setItem('galagaMobileHighScore', highScore);
             }
             document.getElementById('finalScore').textContent = score;
             document.getElementById('finalStage').textContent = stage;
             document.getElementById('gameOverScreen').style.display = 'flex';
             document.getElementById('speedIndicator').style.display = 'none';
+            pauseBtn.style.display = 'none';
+            stopBtn.style.display = 'none';
         }
 
-        // 다음 스테이지
         function nextStage() {
             stage++;
             playStageClearSound();
             initStage();
-            // 스테이지 알림 효과
             particles.push({
                 x: canvas.width / 2,
                 y: canvas.height / 2,
@@ -854,14 +1173,13 @@
             });
         }
 
-        // 플레이어 그리기 (우주선)
         function drawPlayer() {
             if (!player.isAlive) return;
 
             ctx.save();
             ctx.translate(player.x + player.width / 2, player.y + player.height / 2);
 
-            // 우주선 본체
+            // 우주선 본체 (PC 버전과 동일)
             ctx.fillStyle = '#ffffff';
             ctx.beginPath();
             ctx.moveTo(0, -player.height / 2);
@@ -895,100 +1213,87 @@
             ctx.restore();
         }
 
-        // 적 그리기
         function drawEnemy(enemy) {
             ctx.save();
             ctx.translate(enemy.x + enemy.width / 2, enemy.y + enemy.height / 2);
             ctx.rotate(enemy.angle);
 
+            const scale = enemy.width / 30;
+
             if (enemy.type === 'boss') {
-                // 보스 적
                 ctx.fillStyle = enemy.health === 2 ? '#00ff00' : '#00aa00';
-                // 본체
                 ctx.beginPath();
                 ctx.arc(0, 0, enemy.width / 2, 0, Math.PI * 2);
                 ctx.fill();
-                // 눈
+
                 ctx.fillStyle = '#ff0000';
                 ctx.beginPath();
-                ctx.arc(-6, -5, 4, 0, Math.PI * 2);
-                ctx.arc(6, -5, 4, 0, Math.PI * 2);
-                ctx.fill();
-                // 뿔
-                ctx.fillStyle = '#00ff00';
-                ctx.beginPath();
-                ctx.moveTo(-10, -enemy.height / 2 + 5);
-                ctx.lineTo(-8, -enemy.height / 2 - 8);
-                ctx.lineTo(-4, -enemy.height / 2 + 5);
-                ctx.fill();
-                ctx.beginPath();
-                ctx.moveTo(4, -enemy.height / 2 + 5);
-                ctx.lineTo(8, -enemy.height / 2 - 8);
-                ctx.lineTo(10, -enemy.height / 2 + 5);
+                ctx.arc(-6 * scale, -5 * scale, 4 * scale, 0, Math.PI * 2);
+                ctx.arc(6 * scale, -5 * scale, 4 * scale, 0, Math.PI * 2);
                 ctx.fill();
 
-                // 캡처된 플레이어 배
+                ctx.fillStyle = '#00ff00';
+                ctx.beginPath();
+                ctx.moveTo(-10 * scale, -enemy.height / 2 + 5 * scale);
+                ctx.lineTo(-8 * scale, -enemy.height / 2 - 8 * scale);
+                ctx.lineTo(-4 * scale, -enemy.height / 2 + 5 * scale);
+                ctx.fill();
+                ctx.beginPath();
+                ctx.moveTo(4 * scale, -enemy.height / 2 + 5 * scale);
+                ctx.lineTo(8 * scale, -enemy.height / 2 - 8 * scale);
+                ctx.lineTo(10 * scale, -enemy.height / 2 + 5 * scale);
+                ctx.fill();
+
                 if (enemy.capturedShip) {
                     ctx.fillStyle = '#ff0000';
                     ctx.beginPath();
-                    ctx.moveTo(0, enemy.height / 2 + 5);
-                    ctx.lineTo(-10, enemy.height / 2 + 20);
-                    ctx.lineTo(10, enemy.height / 2 + 20);
+                    ctx.moveTo(0, enemy.height / 2 + 5 * scale);
+                    ctx.lineTo(-10 * scale, enemy.height / 2 + 20 * scale);
+                    ctx.lineTo(10 * scale, enemy.height / 2 + 20 * scale);
                     ctx.closePath();
                     ctx.fill();
                 }
             } else if (enemy.type === 'butterfly') {
-                // 나비 적
                 ctx.fillStyle = enemy.color;
-                // 날개
                 ctx.beginPath();
-                ctx.ellipse(-10, 0, 8, 12, Math.PI / 6, 0, Math.PI * 2);
+                ctx.ellipse(-10 * scale, 0, 8 * scale, 12 * scale, Math.PI / 6, 0, Math.PI * 2);
                 ctx.fill();
                 ctx.beginPath();
-                ctx.ellipse(10, 0, 8, 12, -Math.PI / 6, 0, Math.PI * 2);
+                ctx.ellipse(10 * scale, 0, 8 * scale, 12 * scale, -Math.PI / 6, 0, Math.PI * 2);
                 ctx.fill();
-                // 몸통
+
                 ctx.fillStyle = '#ff00aa';
                 ctx.beginPath();
-                ctx.ellipse(0, 0, 4, 10, 0, 0, Math.PI * 2);
+                ctx.ellipse(0, 0, 4 * scale, 10 * scale, 0, 0, Math.PI * 2);
                 ctx.fill();
             } else {
-                // 벌 적
                 ctx.fillStyle = enemy.color;
-                // 몸통
                 ctx.beginPath();
-                ctx.ellipse(0, 0, 10, 12, 0, 0, Math.PI * 2);
+                ctx.ellipse(0, 0, 10 * scale, 12 * scale, 0, 0, Math.PI * 2);
                 ctx.fill();
-                // 줄무늬
+
                 ctx.fillStyle = '#000';
-                ctx.fillRect(-10, -3, 20, 3);
-                ctx.fillRect(-10, 3, 20, 3);
-                // 날개
+                ctx.fillRect(-10 * scale, -3 * scale, 20 * scale, 3 * scale);
+                ctx.fillRect(-10 * scale, 3 * scale, 20 * scale, 3 * scale);
+
                 ctx.fillStyle = '#ffffaa';
                 ctx.beginPath();
-                ctx.ellipse(-12, -5, 6, 8, Math.PI / 4, 0, Math.PI * 2);
+                ctx.ellipse(-12 * scale, -5 * scale, 6 * scale, 8 * scale, Math.PI / 4, 0, Math.PI * 2);
                 ctx.fill();
                 ctx.beginPath();
-                ctx.ellipse(12, -5, 6, 8, -Math.PI / 4, 0, Math.PI * 2);
+                ctx.ellipse(12 * scale, -5 * scale, 6 * scale, 8 * scale, -Math.PI / 4, 0, Math.PI * 2);
                 ctx.fill();
             }
 
             ctx.restore();
         }
 
-        // 총알 그리기
         function drawBullet(bullet, isEnemy = false) {
+            // PC 버전과 동일한 방식 (크기만 더 크게)
             ctx.fillStyle = isEnemy ? '#ff6600' : '#00ffff';
-            ctx.fillRect(bullet.x - 2, bullet.y - 6, 4, 12);
-
-            // 발광 효과
-            ctx.shadowBlur = 10;
-            ctx.shadowColor = isEnemy ? '#ff6600' : '#00ffff';
-            ctx.fillRect(bullet.x - 2, bullet.y - 6, 4, 12);
-            ctx.shadowBlur = 0;
+            ctx.fillRect(bullet.x - 4, bullet.y - 12, 8, 24);
         }
 
-        // 폭발 효과
         function createExplosion(x, y, color = '#ff6600') {
             for (let i = 0; i < 15; i++) {
                 const angle = (Math.PI * 2 / 15) * i;
@@ -1006,15 +1311,15 @@
             }
         }
 
-        // 파티클 업데이트 및 그리기
         function updateParticles() {
+            const scale = getScaleFactor();
             for (let i = particles.length - 1; i >= 0; i--) {
                 const p = particles[i];
                 p.life--;
 
                 if (p.type === 'text') {
                     ctx.fillStyle = `rgba(255, 255, 0, ${p.life / 120})`;
-                    ctx.font = '24px "Press Start 2P", monospace';
+                    ctx.font = `${20 * scale}px "Press Start 2P", monospace`;
                     ctx.textAlign = 'center';
                     ctx.fillText(p.text, p.x, p.y);
                 } else {
@@ -1026,7 +1331,7 @@
                     ctx.fillStyle = p.color;
                     ctx.globalAlpha = p.life / 30;
                     ctx.beginPath();
-                    ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                    ctx.arc(p.x, p.y, p.size * scale, 0, Math.PI * 2);
                     ctx.fill();
                     ctx.globalAlpha = 1;
                 }
@@ -1037,7 +1342,6 @@
             }
         }
 
-        // 별 배경 업데이트
         function updateStars() {
             ctx.fillStyle = '#fff';
             for (let star of stars) {
@@ -1054,8 +1358,8 @@
             ctx.globalAlpha = 1;
         }
 
-        // 적 이동 (편대 진입)
         function updateEnemyEntering(enemy) {
+            const scale = getScaleFactor();
             if (enemy.enterTimer > 0) {
                 enemy.enterTimer -= gameSpeed;
                 return;
@@ -1065,14 +1369,12 @@
             const targetY = enemy.targetY;
 
             if (enemy.enterPhase === 0) {
-                // 위에서 들어오기
-                enemy.y += 3 * gameSpeed;
-                enemy.x = targetX + Math.sin(enemy.y / 20) * 30;
+                enemy.y += 3 * scale * gameSpeed;
+                enemy.x = targetX + Math.sin(enemy.y / (20 * scale)) * 30 * scale;
                 if (enemy.y >= targetY) {
                     enemy.enterPhase = 1;
                 }
             } else {
-                // 위치 조정
                 const dx = targetX - enemy.x;
                 const dy = targetY - enemy.y;
                 enemy.x += dx * 0.1 * gameSpeed;
@@ -1087,11 +1389,11 @@
             }
         }
 
-        // 편대 이동
         function updateFormation() {
-            formation.x += formation.speed * formation.direction * gameSpeed;
+            const scale = getScaleFactor();
+            formation.x += formation.speed * scale * formation.direction * gameSpeed;
 
-            if (formation.x > 80 || formation.x < 0) {
+            if (formation.x > 80 * scale || formation.x < 0) {
                 formation.direction *= -1;
             }
 
@@ -1102,7 +1404,6 @@
             }
         }
 
-        // 적 공격 패턴
         function startEnemyAttack(enemy) {
             if (enemy.attacking || enemy.entering) return;
 
@@ -1117,32 +1418,29 @@
             const startX = enemy.x;
             const startY = enemy.y;
             const playerX = player.x + player.width / 2;
+            const scale = getScaleFactor();
 
-            // 곡선 공격 경로 생성 (위에서 아래로만)
             const steps = 60;
             for (let i = 0; i <= steps; i++) {
                 const t = i / steps;
                 let x, y;
 
                 if (enemy.type === 'boss') {
-                    // 보스는 더 복잡한 패턴
-                    x = startX + Math.sin(t * Math.PI * 2) * 100 + (playerX - startX) * t;
+                    x = startX + Math.sin(t * Math.PI * 2) * 100 * scale + (playerX - startX) * t;
                     y = startY + t * (canvas.height + 50 - startY);
                 } else {
-                    // 일반 적
-                    x = startX + Math.sin(t * Math.PI * 3) * 80 + (playerX - startX) * t * 0.5;
+                    x = startX + Math.sin(t * Math.PI * 3) * 80 * scale + (playerX - startX) * t * 0.5;
                     y = startY + t * (canvas.height + 50 - startY);
                 }
 
                 path.push({ x, y });
             }
 
-            // 아래로 내려간 후 바로 편대로 복귀 (올라오는 경로 제거)
             return path;
         }
 
         function updateAttackingEnemy(enemy) {
-            // 속도에 따라 여러 프레임 이동 가능
+            const scale = getScaleFactor();
             const moveSteps = Math.ceil(gameSpeed);
             for (let step = 0; step < moveSteps; step++) {
                 if (enemy.attackIndex < enemy.attackPath.length) {
@@ -1155,17 +1453,15 @@
                     enemy.y = target.y;
                     enemy.attackIndex++;
 
-                    // 가끔 총알 발사
-                    if (Math.random() < 0.02 * gameSpeed && enemy.y < canvas.height - 100) {
+                    if (Math.random() < 0.02 * gameSpeed && enemy.y < canvas.height - 100 * scale) {
                         enemyBullets.push({
                             x: enemy.x + enemy.width / 2,
                             y: enemy.y + enemy.height,
-                            vy: 5 * gameSpeed
+                            vy: 5 * scale * gameSpeed
                         });
                         playEnemyShootSound();
                     }
                 } else {
-                    // 공격 완료, 편대로 복귀
                     enemy.attacking = false;
                     enemy.inFormation = true;
                     enemy.angle = 0;
@@ -1176,7 +1472,6 @@
             }
         }
 
-        // 충돌 감지
         function checkCollision(a, b) {
             return a.x < b.x + b.width &&
                    a.x + a.width > b.x &&
@@ -1184,18 +1479,12 @@
                    a.y + a.height > b.y;
         }
 
-        // 플레이어 업데이트
         function updatePlayer() {
             if (!player.isAlive) {
-                player.respawnTimer--;
-                if (player.respawnTimer <= 0 && lives > 0) {
-                    player.isAlive = true;
-                    player.x = canvas.width / 2 - 20;
-                }
+                // 리스폰은 RESTART 버튼을 눌러야만 됨
                 return;
             }
 
-            // 이동 (플레이어 속도는 게임 속도와 독립적으로 유지, 반응성 보장)
             const playerMoveSpeed = player.speed * Math.max(1, gameSpeed * 0.7);
             if (keys.left && player.x > 10) {
                 player.x -= playerMoveSpeed;
@@ -1204,13 +1493,22 @@
                 player.x += playerMoveSpeed;
             }
 
-            // 발사
             if (keys.fire && canFire && player.bullets.length < player.maxBullets) {
+                const scale = getScaleFactor();
+                const bulletSpacing = 10 * scale;
+                // 좌측 총알
                 player.bullets.push({
-                    x: player.x + player.width / 2,
+                    x: player.x + player.width / 2 - bulletSpacing,
                     y: player.y,
-                    width: 4,
-                    height: 12
+                    width: 4 * scale,
+                    height: 12 * scale
+                });
+                // 우측 총알
+                player.bullets.push({
+                    x: player.x + player.width / 2 + bulletSpacing,
+                    y: player.y,
+                    width: 4 * scale,
+                    height: 12 * scale
                 });
                 playShootSound();
                 canFire = false;
@@ -1218,19 +1516,19 @@
             }
         }
 
-        // 총알 업데이트
         function updateBullets() {
-            // 플레이어 총알
+            const scale = getScaleFactor();
+
+            const bulletSpeed = Math.max(10, 10 * scale) * gameSpeed;
             for (let i = player.bullets.length - 1; i >= 0; i--) {
                 const bullet = player.bullets[i];
-                bullet.y -= 10 * gameSpeed;
+                bullet.y -= bulletSpeed;
 
                 if (bullet.y < 0) {
                     player.bullets.splice(i, 1);
                     continue;
                 }
 
-                // 적과 충돌 체크
                 for (let j = enemies.length - 1; j >= 0; j--) {
                     const enemy = enemies[j];
                     if (checkCollision(bullet, enemy)) {
@@ -1238,17 +1536,15 @@
                         enemy.health--;
 
                         if (enemy.health <= 0) {
-                            // 적 처치
                             let points = enemy.points;
-                            if (enemy.attacking) points *= 2; // 공격 중인 적은 2배 점수
+                            if (enemy.attacking) points *= 2;
                             score += points;
 
                             createExplosion(enemy.x + enemy.width / 2, enemy.y + enemy.height / 2, enemy.color);
                             playExplosionSound();
 
-                            // 캡처된 배가 있으면 해방
                             if (enemy.capturedShip) {
-                                player.maxBullets = 15; // 더블 샷 효과 (더 많은 총알)
+                                player.maxBullets = 15;
                                 score += 500;
                                 playBonusSound();
                             }
@@ -1260,7 +1556,6 @@
                 }
             }
 
-            // 적 총알
             for (let i = enemyBullets.length - 1; i >= 0; i--) {
                 const bullet = enemyBullets[i];
                 bullet.y += bullet.vy * gameSpeed;
@@ -1270,28 +1565,42 @@
                     continue;
                 }
 
-                // 플레이어와 충돌
-                if (player.isAlive && checkCollision({ x: bullet.x - 4, y: bullet.y - 6, width: 8, height: 12 }, player)) {
+                if (player.isAlive && checkCollision({
+                    x: bullet.x - 4 * scale,
+                    y: bullet.y - 6 * scale,
+                    width: 8 * scale,
+                    height: 12 * scale
+                }, player)) {
                     enemyBullets.splice(i, 1);
                     playerHit();
                 }
             }
         }
 
-        // 플레이어 피격
         function playerHit() {
             lives--;
             player.isAlive = false;
-            player.respawnTimer = 120;
             createExplosion(player.x + player.width / 2, player.y + player.height / 2, '#00ffff');
             playPlayerHitSound();
 
             if (lives <= 0) {
                 gameOver();
+            } else {
+                // FIRE 버튼을 RESTART로 변경
+                fireBtn.textContent = 'RESTART';
             }
         }
 
-        // 적 업데이트
+        function respawnPlayer() {
+            if (!player.isAlive && lives > 0) {
+                player.isAlive = true;
+                player.x = canvas.width / 2 - player.width / 2;
+                player.y = canvas.height - 200;
+                // RESTART 버튼을 FIRE로 변경
+                fireBtn.textContent = 'FIRE';
+            }
+        }
+
         function updateEnemies() {
             updateFormation();
 
@@ -1302,7 +1611,6 @@
                     updateAttackingEnemy(enemy);
                 }
 
-                // 플레이어와 충돌
                 if (player.isAlive && !enemy.entering && checkCollision(enemy, player)) {
                     playerHit();
                     enemy.health = 0;
@@ -1311,7 +1619,6 @@
                 }
             }
 
-            // 랜덤하게 공격 시작 (속도에 따라 공격 빈도 조절)
             if (Math.random() < (0.01 + stage * 0.002) * gameSpeed) {
                 const formationEnemies = enemies.filter(e => e.inFormation && !e.attacking);
                 if (formationEnemies.length > 0) {
@@ -1320,16 +1627,17 @@
                 }
             }
 
-            // 스테이지 클리어 체크
             if (enemies.length === 0) {
                 nextStage();
             }
         }
 
-        // UI 그리기
         function drawUI() {
+            const scale = getScaleFactor();
+            const fontSize = Math.max(12, 14 * scale);
+
             ctx.fillStyle = '#ff0000';
-            ctx.font = '16px "Press Start 2P", monospace';
+            ctx.font = `${fontSize}px "Press Start 2P", monospace`;
             ctx.textAlign = 'left';
             ctx.fillText(`SCORE: ${score}`, 10, 25);
 
@@ -1340,12 +1648,12 @@
             ctx.fillStyle = '#ffff00';
             ctx.fillText(`STAGE ${stage}`, canvas.width - 10, 25);
 
-            // 라이프 표시
+            // 라이프
             ctx.fillStyle = '#00ffff';
             for (let i = 0; i < lives; i++) {
                 ctx.save();
-                ctx.translate(20 + i * 25, canvas.height - 25);
-                ctx.scale(0.5, 0.5);
+                ctx.translate(20 + i * 25 * scale, canvas.height - 25 * scale);
+                ctx.scale(0.4 * scale, 0.4 * scale);
                 ctx.beginPath();
                 ctx.moveTo(0, -20);
                 ctx.lineTo(-15, 15);
@@ -1357,13 +1665,10 @@
             }
         }
 
-        // 메인 게임 루프
         function update() {
-            // 화면 지우기
             ctx.fillStyle = '#000';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            // 별 배경
             updateStars();
 
             if (gameState === 'playing') {
@@ -1371,7 +1676,6 @@
                 updateBullets();
                 updateEnemies();
 
-                // 그리기
                 drawPlayer();
 
                 for (let enemy of enemies) {
@@ -1388,12 +1692,30 @@
 
                 updateParticles();
                 drawUI();
+            } else if (gameState === 'paused') {
+                // 일시정지 상태: 화면만 그리고 로직은 실행 안 함
+                drawPlayer();
+
+                for (let enemy of enemies) {
+                    drawEnemy(enemy);
+                }
+
+                for (let bullet of player.bullets) {
+                    drawBullet(bullet);
+                }
+
+                for (let bullet of enemyBullets) {
+                    drawBullet(bullet, true);
+                }
+
+                drawUI();
             }
 
             requestAnimationFrame(update);
         }
 
-        // 게임 시작
+        // 초기화
+        initStars();
         update();
     </script>
 </body>
