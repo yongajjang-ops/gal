@@ -1,0 +1,215 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="40%" r="75%">
+      <stop offset="0%" stop-color="#0a0a2e"/>
+      <stop offset="100%" stop-color="#000000"/>
+    </radialGradient>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <filter id="glowRed" x="-30%" y="-80%" width="160%" height="260%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="6" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Space background -->
+  <rect width="512" height="512" fill="url(#bg)"/>
+
+  <!-- Stars -->
+  <circle cx="32"  cy="25"  r="1.5" fill="white" opacity="0.9"/>
+  <circle cx="78"  cy="60"  r="1"   fill="white" opacity="0.7"/>
+  <circle cx="145" cy="30"  r="2"   fill="white" opacity="0.8"/>
+  <circle cx="192" cy="88"  r="1"   fill="white" opacity="0.6"/>
+  <circle cx="295" cy="20"  r="1"   fill="white" opacity="0.7"/>
+  <circle cx="352" cy="74"  r="2"   fill="white" opacity="0.8"/>
+  <circle cx="412" cy="36"  r="1.5" fill="white" opacity="0.9"/>
+  <circle cx="465" cy="58"  r="1"   fill="white" opacity="0.6"/>
+  <circle cx="492" cy="108" r="2"   fill="white" opacity="0.8"/>
+  <circle cx="18"  cy="152" r="1.5" fill="white" opacity="0.7"/>
+  <circle cx="488" cy="178" r="1.5" fill="white" opacity="0.8"/>
+  <circle cx="442" cy="192" r="1"   fill="white" opacity="0.6"/>
+  <circle cx="66"  cy="268" r="1.5" fill="white" opacity="0.7"/>
+  <circle cx="488" cy="308" r="1"   fill="white" opacity="0.8"/>
+  <circle cx="14"  cy="328" r="2"   fill="white" opacity="0.7"/>
+  <circle cx="498" cy="384" r="1.5" fill="white" opacity="0.9"/>
+  <circle cx="24"  cy="442" r="1"   fill="white" opacity="0.8"/>
+  <circle cx="492" cy="460" r="2"   fill="white" opacity="0.6"/>
+  <circle cx="118" cy="494" r="1.5" fill="white" opacity="0.9"/>
+  <circle cx="382" cy="502" r="1"   fill="white" opacity="0.7"/>
+  <circle cx="58"  cy="482" r="2"   fill="white" opacity="0.7"/>
+  <circle cx="434" cy="474" r="1.5" fill="white" opacity="0.8"/>
+  <circle cx="260" cy="498" r="1"   fill="white" opacity="0.6"/>
+  <circle cx="130" cy="140" r="1"   fill="white" opacity="0.5"/>
+  <circle cx="380" cy="130" r="1.5" fill="white" opacity="0.6"/>
+
+  <!-- Laser beams (drawn before enemies so enemies appear in front) -->
+  <!-- Outer glow -->
+  <rect x="244" y="72" width="18" height="252" fill="#00ffff" opacity="0.10"/>
+  <rect x="248" y="72" width="10" height="252" fill="#00ffff" opacity="0.20"/>
+  <!-- Beam core -->
+  <rect x="250" y="72" width="5"  height="252" fill="#00ffff" opacity="0.85"/>
+  <rect x="257" y="72" width="4"  height="252" fill="#00ffff" opacity="0.50"/>
+
+  <!-- ===== Boss Galaga enemies (row 1, y=108) ===== -->
+  <!-- Centers: x=166, 226, 286, 346 -->
+
+  <g transform="translate(166,108)" filter="url(#glow)">
+    <circle cx="0" cy="0" r="18" fill="#00cc00"/>
+    <circle cx="-7" cy="-5" r="4" fill="#ff0000"/>
+    <circle cx="7"  cy="-5" r="4" fill="#ff0000"/>
+    <polygon points="-10,-18 -7,-28 -4,-18" fill="#00ff00"/>
+    <polygon points=" 4,-18  7,-28 10,-18" fill="#00ff00"/>
+    <line x1="-11" y1="9" x2="-18" y2="16" stroke="#00cc00" stroke-width="4" stroke-linecap="round"/>
+    <line x1=" 11" y1="9" x2=" 18" y2="16" stroke="#00cc00" stroke-width="4" stroke-linecap="round"/>
+  </g>
+
+  <g transform="translate(226,108)" filter="url(#glow)">
+    <circle cx="0" cy="0" r="18" fill="#00cc00"/>
+    <circle cx="-7" cy="-5" r="4" fill="#ff0000"/>
+    <circle cx="7"  cy="-5" r="4" fill="#ff0000"/>
+    <polygon points="-10,-18 -7,-28 -4,-18" fill="#00ff00"/>
+    <polygon points=" 4,-18  7,-28 10,-18" fill="#00ff00"/>
+    <line x1="-11" y1="9" x2="-18" y2="16" stroke="#00cc00" stroke-width="4" stroke-linecap="round"/>
+    <line x1=" 11" y1="9" x2=" 18" y2="16" stroke="#00cc00" stroke-width="4" stroke-linecap="round"/>
+  </g>
+
+  <g transform="translate(286,108)" filter="url(#glow)">
+    <circle cx="0" cy="0" r="18" fill="#00cc00"/>
+    <circle cx="-7" cy="-5" r="4" fill="#ff0000"/>
+    <circle cx="7"  cy="-5" r="4" fill="#ff0000"/>
+    <polygon points="-10,-18 -7,-28 -4,-18" fill="#00ff00"/>
+    <polygon points=" 4,-18  7,-28 10,-18" fill="#00ff00"/>
+    <line x1="-11" y1="9" x2="-18" y2="16" stroke="#00cc00" stroke-width="4" stroke-linecap="round"/>
+    <line x1=" 11" y1="9" x2=" 18" y2="16" stroke="#00cc00" stroke-width="4" stroke-linecap="round"/>
+  </g>
+
+  <g transform="translate(346,108)" filter="url(#glow)">
+    <circle cx="0" cy="0" r="18" fill="#00cc00"/>
+    <circle cx="-7" cy="-5" r="4" fill="#ff0000"/>
+    <circle cx="7"  cy="-5" r="4" fill="#ff0000"/>
+    <polygon points="-10,-18 -7,-28 -4,-18" fill="#00ff00"/>
+    <polygon points=" 4,-18  7,-28 10,-18" fill="#00ff00"/>
+    <line x1="-11" y1="9" x2="-18" y2="16" stroke="#00cc00" stroke-width="4" stroke-linecap="round"/>
+    <line x1=" 11" y1="9" x2=" 18" y2="16" stroke="#00cc00" stroke-width="4" stroke-linecap="round"/>
+  </g>
+
+  <!-- ===== Butterfly enemies (row 2, y=176) ===== -->
+  <!-- Centers: x=156, 206, 256, 306, 356 -->
+
+  <g transform="translate(156,176)">
+    <ellipse cx="-9" cy="0" rx="8" ry="11" fill="#ff00ff" transform="rotate(-20,-9,0)"/>
+    <ellipse cx=" 9" cy="0" rx="8" ry="11" fill="#ff00ff" transform="rotate( 20, 9,0)"/>
+    <ellipse cx="0"  cy="0" rx="4" ry="10" fill="#cc00cc"/>
+    <circle  cx="0"  cy="-6" r="3"          fill="#ff66ff"/>
+  </g>
+
+  <g transform="translate(206,176)">
+    <ellipse cx="-9" cy="0" rx="8" ry="11" fill="#ff00ff" transform="rotate(-20,-9,0)"/>
+    <ellipse cx=" 9" cy="0" rx="8" ry="11" fill="#ff00ff" transform="rotate( 20, 9,0)"/>
+    <ellipse cx="0"  cy="0" rx="4" ry="10" fill="#cc00cc"/>
+    <circle  cx="0"  cy="-6" r="3"          fill="#ff66ff"/>
+  </g>
+
+  <g transform="translate(256,176)">
+    <ellipse cx="-9" cy="0" rx="8" ry="11" fill="#ff00ff" transform="rotate(-20,-9,0)"/>
+    <ellipse cx=" 9" cy="0" rx="8" ry="11" fill="#ff00ff" transform="rotate( 20, 9,0)"/>
+    <ellipse cx="0"  cy="0" rx="4" ry="10" fill="#cc00cc"/>
+    <circle  cx="0"  cy="-6" r="3"          fill="#ff66ff"/>
+  </g>
+
+  <g transform="translate(306,176)">
+    <ellipse cx="-9" cy="0" rx="8" ry="11" fill="#ff00ff" transform="rotate(-20,-9,0)"/>
+    <ellipse cx=" 9" cy="0" rx="8" ry="11" fill="#ff00ff" transform="rotate( 20, 9,0)"/>
+    <ellipse cx="0"  cy="0" rx="4" ry="10" fill="#cc00cc"/>
+    <circle  cx="0"  cy="-6" r="3"          fill="#ff66ff"/>
+  </g>
+
+  <g transform="translate(356,176)">
+    <ellipse cx="-9" cy="0" rx="8" ry="11" fill="#ff00ff" transform="rotate(-20,-9,0)"/>
+    <ellipse cx=" 9" cy="0" rx="8" ry="11" fill="#ff00ff" transform="rotate( 20, 9,0)"/>
+    <ellipse cx="0"  cy="0" rx="4" ry="10" fill="#cc00cc"/>
+    <circle  cx="0"  cy="-6" r="3"          fill="#ff66ff"/>
+  </g>
+
+  <!-- ===== Bee enemies (row 3, y=245) ===== -->
+  <!-- Centers: x=146, 190, 234, 278, 322, 366 -->
+
+  <g transform="translate(146,245)">
+    <ellipse cx="-12" cy="-4" rx="6" ry="8" fill="#ffffaa" opacity="0.8" transform="rotate( 30,-12,-4)"/>
+    <ellipse cx=" 12" cy="-4" rx="6" ry="8" fill="#ffffaa" opacity="0.8" transform="rotate(-30, 12,-4)"/>
+    <ellipse cx="0" cy="0" rx="10" ry="12" fill="#ffff00"/>
+    <rect x="-10" y="-3" width="20" height="3" fill="#333"/>
+    <rect x="-10" y=" 3" width="20" height="3" fill="#333"/>
+  </g>
+
+  <g transform="translate(190,245)">
+    <ellipse cx="-12" cy="-4" rx="6" ry="8" fill="#ffffaa" opacity="0.8" transform="rotate( 30,-12,-4)"/>
+    <ellipse cx=" 12" cy="-4" rx="6" ry="8" fill="#ffffaa" opacity="0.8" transform="rotate(-30, 12,-4)"/>
+    <ellipse cx="0" cy="0" rx="10" ry="12" fill="#ffff00"/>
+    <rect x="-10" y="-3" width="20" height="3" fill="#333"/>
+    <rect x="-10" y=" 3" width="20" height="3" fill="#333"/>
+  </g>
+
+  <g transform="translate(234,245)">
+    <ellipse cx="-12" cy="-4" rx="6" ry="8" fill="#ffffaa" opacity="0.8" transform="rotate( 30,-12,-4)"/>
+    <ellipse cx=" 12" cy="-4" rx="6" ry="8" fill="#ffffaa" opacity="0.8" transform="rotate(-30, 12,-4)"/>
+    <ellipse cx="0" cy="0" rx="10" ry="12" fill="#ffff00"/>
+    <rect x="-10" y="-3" width="20" height="3" fill="#333"/>
+    <rect x="-10" y=" 3" width="20" height="3" fill="#333"/>
+  </g>
+
+  <g transform="translate(278,245)">
+    <ellipse cx="-12" cy="-4" rx="6" ry="8" fill="#ffffaa" opacity="0.8" transform="rotate( 30,-12,-4)"/>
+    <ellipse cx=" 12" cy="-4" rx="6" ry="8" fill="#ffffaa" opacity="0.8" transform="rotate(-30, 12,-4)"/>
+    <ellipse cx="0" cy="0" rx="10" ry="12" fill="#ffff00"/>
+    <rect x="-10" y="-3" width="20" height="3" fill="#333"/>
+    <rect x="-10" y=" 3" width="20" height="3" fill="#333"/>
+  </g>
+
+  <g transform="translate(322,245)">
+    <ellipse cx="-12" cy="-4" rx="6" ry="8" fill="#ffffaa" opacity="0.8" transform="rotate( 30,-12,-4)"/>
+    <ellipse cx=" 12" cy="-4" rx="6" ry="8" fill="#ffffaa" opacity="0.8" transform="rotate(-30, 12,-4)"/>
+    <ellipse cx="0" cy="0" rx="10" ry="12" fill="#ffff00"/>
+    <rect x="-10" y="-3" width="20" height="3" fill="#333"/>
+    <rect x="-10" y=" 3" width="20" height="3" fill="#333"/>
+  </g>
+
+  <g transform="translate(366,245)">
+    <ellipse cx="-12" cy="-4" rx="6" ry="8" fill="#ffffaa" opacity="0.8" transform="rotate( 30,-12,-4)"/>
+    <ellipse cx=" 12" cy="-4" rx="6" ry="8" fill="#ffffaa" opacity="0.8" transform="rotate(-30, 12,-4)"/>
+    <ellipse cx="0" cy="0" rx="10" ry="12" fill="#ffff00"/>
+    <rect x="-10" y="-3" width="20" height="3" fill="#333"/>
+    <rect x="-10" y=" 3" width="20" height="3" fill="#333"/>
+  </g>
+
+  <!-- ===== Player Spaceship ===== -->
+  <!-- Body (white) — same shape as in-game, scaled to w=h=120, center (256,390) -->
+  <!-- nose=(256,330) wingL=(196,450) innerL=(226,430) bot=(256,438) innerR=(286,430) wingR=(316,450) -->
+  <polygon points="256,330 196,450 226,430 256,438 286,430 316,450"
+           fill="#ffffff" filter="url(#glow)"/>
+  <!-- Cockpit (cyan) -->
+  <polygon points="256,350 216,430 256,420 296,430"
+           fill="#00ffff" opacity="0.9"/>
+  <!-- Engine flame outer -->
+  <ellipse cx="256" cy="440" rx="24" ry="12" fill="#ff3300" opacity="0.20"/>
+  <polygon points="236,438 256,480 276,438" fill="#ff6600" filter="url(#glow)"/>
+  <!-- Engine flame mid -->
+  <polygon points="243,438 256,465 269,438" fill="#ffaa00"/>
+  <!-- Engine flame core -->
+  <polygon points="249,438 256,452 263,438" fill="#ffffff" opacity="0.9"/>
+
+  <!-- GALAGA title (drawn last — topmost layer) -->
+  <text x="256" y="50"
+        font-family="'Courier New', Courier, monospace"
+        font-size="44" font-weight="bold"
+        fill="#ff0000" text-anchor="middle" letter-spacing="3"
+        filter="url(#glowRed)">GALAGA</text>
+</svg>
